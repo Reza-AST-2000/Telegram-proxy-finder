@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- PWA meta tags -->
-    <meta name="theme-color" content="#010409">
-    <link rel="manifest" href="manifest.json">
-    <!-- Title and Fonts -->
     <title>پروکسی یاب تلگرام</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="پروکسی یاب">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
         
@@ -263,7 +266,6 @@
 </head>
 <body>
 
-    <!-- ===== Welcome Start ===== -->
     <div id="welcomeModal" class="welcome-modal-overlay hidden">
         <div class="welcome-modal-content">
             <button id="closeWelcomeModal" class="welcome-modal-close">&times;</button>
@@ -278,14 +280,11 @@
             </a>
         </div>
     </div>
-    <!-- ===== Welcome End ===== -->
-
-
     <main class="container mx-auto px-4 py-8 md:py-12 relative z-10">
         
         <header class="text-center mb-12 fade-in-up">
             <div class="inline-block p-4 bg-gray-900/50 rounded-full mb-6 border border-gray-800 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20">
-                <i class="fa-brands fa-telegram-plane text-4xl text-white"></i>
+                <i class="fa-solid fa-user-secret text-4xl text-white"></i>
             </div>
             <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-cyan-300">
                 پروکسی یاب تلگرام
@@ -317,6 +316,11 @@
                     <button id="testAllBtn" class="btn btn-success w-full md:w-auto px-6 py-3 text-base font-semibold flex items-center justify-center gap-2">
                         <i class="fa-solid fa-bolt-lightning btn-icon transition-transform duration-300"></i>
                         <span>تست همه</span>
+                    </button>
+
+                    <button id="install-pwa-button" class="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold hidden">
+                        <i class="fa-solid fa-download btn-icon transition-transform duration-300"></i>
+                        <span>نصب برنامه</span>
                     </button>
                 </div>
             </div>
@@ -353,12 +357,10 @@
         </div>
     </main>
     
-    <!-- ===== Footer Section Start ===== -->
     <footer class="text-center py-8 mt-12 border-t border-gray-800 text-slate-400 fade-in-up" style="animation-delay: 0.4s;">
         <div class="container mx-auto px-4">
             <div class="grid md:grid-cols-2 gap-8 items-center">
                 
-                <!-- Telegram Channel Section -->
                 <div class="flex flex-col items-center md:items-start gap-3">
                     <div class="flex items-center gap-3">
                         <i class="fab fa-telegram text-2xl text-sky-400"></i>
@@ -371,7 +373,6 @@
                     </a>
                 </div>
     
-                <!-- Developer Credit Section -->
                 <div class="flex flex-col items-center md:items-end gap-3">
                      <div class="flex items-center gap-3">
                         <i class="fa-solid fa-code text-xl text-green-400"></i>
@@ -390,31 +391,11 @@
                 <p class="flex items-center justify-center gap-x-2 flex-wrap">
                     <span>&copy; 1404 پروکسی یاب تلگرام. تمامی حقوق محفوظ است.</span>
                     <span class="bg-sky-500/10 text-sky-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-sky-500/20">نسخه 1.1</span>
-                    <button id="unregisterBtn" class="bg-red-500/10 text-red-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-red-500/20 transition-all duration-300 hover:bg-red-500/20">
-                        <i class="fa-solid fa-trash-can ml-1"></i> حذف Service Worker
-                    </button>
                 </p>
             </div>
         </div>
     </footer>
-    <!-- ===== Footer Section End ===== -->
-
     <script>
-        // PWA service worker registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                        showToastNotification('✅ قابلیت PWA فعال شد!', 'success');
-                    })
-                    .catch(error => {
-                        console.error('Service Worker registration failed:', error);
-                        showToastNotification('❌ ثبت Service Worker با خطا مواجه شد.', 'error');
-                    });
-            });
-        }
-        
         // Interactive Glow Effect for Cards
         document.addEventListener('mousemove', e => {
             const cards = document.querySelectorAll('.proxy-card');
@@ -448,7 +429,7 @@
 
         const countryTranslations = {
             'Russia': '🇷🇺 روسیه', 'Netherlands': '🇳🇱 هلند', 'United States': '🇺🇸 آمریکا',
-            'Germany': '🇩 آلمان', 'France': '🇫🇷 فرانسه', 'United Kingdom': '🇬🇧 انگلستان',
+            'Germany': '🇩🇪 آلمان', 'France': '🇫🇷 فرانسه', 'United Kingdom': '🇬🇧 انگلستان',
             'Canada': '🇨🇦 کانادا', 'Italy': '🇮🇹 ایتالیا', 'Spain': '🇪🇸 اسپانیا', 'Turkey': '🇹🇷 ترکیه',
             'Finland': '🇫🇮 فنلاند', 'Sweden': '🇸🇪 سوئد', 'Poland': '🇵🇱 لهستان', 'Iran': '🇮🇷 ایران'
         };
@@ -698,28 +679,24 @@
         elements.testAllBtn.addEventListener('click', testAllProxies);
         elements.loadMoreBtn.addEventListener('click', loadMoreProxies);
 
-        // New button logic to unregister service worker
-        document.getElementById('unregisterBtn').addEventListener('click', () => {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(registrations => {
-                    for (let registration of registrations) {
-                        registration.unregister();
-                    }
-                    showToastNotification('✅ Service Worker حذف شد! لطفاً صفحه را رفرش کنید.', 'success');
-                }).catch(err => {
-                    console.error('Failed to unregister service worker:', err);
-                    showToastNotification('❌ خطا در حذف Service Worker.', 'error');
-                });
-            } else {
-                showToastNotification('❌ Service Worker در این مرورگر پشتیبانی نمی‌شود.', 'error');
-            }
-        });
-
         window.addEventListener('load', () => {
             loadProxies();
             // Show the welcome modal after a short delay
             setTimeout(showWelcomeModal, 700);
         });
     </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered!', reg))
+                    .catch(err => console.log('Service Worker registration failed: ', err));
+            });
+        }
+    </script>
+    
+    <script src="/pwa-install.js"></script>
+
 </body>
 </html>
