@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PWA meta tags -->
+    <meta name="theme-color" content="#010409">
+    <link rel="manifest" href="manifest.json">
+    <!-- Title and Fonts -->
     <title>پروکسی یاب تلگرام</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -281,7 +285,7 @@
         
         <header class="text-center mb-12 fade-in-up">
             <div class="inline-block p-4 bg-gray-900/50 rounded-full mb-6 border border-gray-800 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20">
-                <i class="fa-solid fa-user-secret text-4xl text-white"></i>
+                <i class="fa-brands fa-telegram-plane text-4xl text-white"></i>
             </div>
             <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-cyan-300">
                 پروکسی یاب تلگرام
@@ -393,6 +397,21 @@
     <!-- ===== Footer Section End ===== -->
 
     <script>
+        // PWA service worker registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                        showToastNotification('✅ قابلیت PWA فعال شد!', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                        showToastNotification('❌ ثبت Service Worker با خطا مواجه شد.', 'error');
+                    });
+            });
+        }
+        
         // Interactive Glow Effect for Cards
         document.addEventListener('mousemove', e => {
             const cards = document.querySelectorAll('.proxy-card');
@@ -426,7 +445,7 @@
 
         const countryTranslations = {
             'Russia': '🇷🇺 روسیه', 'Netherlands': '🇳🇱 هلند', 'United States': '🇺🇸 آمریکا',
-            'Germany': '🇩� آلمان', 'France': '🇫🇷 فرانسه', 'United Kingdom': '🇬🇧 انگلستان',
+            'Germany': '🇩 آلمان', 'France': '🇫🇷 فرانسه', 'United Kingdom': '🇬🇧 انگلستان',
             'Canada': '🇨🇦 کانادا', 'Italy': '🇮🇹 ایتالیا', 'Spain': '🇪🇸 اسپانیا', 'Turkey': '🇹🇷 ترکیه',
             'Finland': '🇫🇮 فنلاند', 'Sweden': '🇸🇪 سوئد', 'Poland': '🇵🇱 لهستان', 'Iran': '🇮🇷 ایران'
         };
@@ -684,4 +703,3 @@
     </script>
 </body>
 </html>
-�
