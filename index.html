@@ -1,34 +1,9 @@
-قابلیت‌های جدید به صورت زیر به کد اضافه شده‌اند و یک فایل HTML کامل به شما ارائه می‌شود.
-
-### تغییرات و قابلیت‌های اضافه شده
-
-  * **۱. ذخیره انتخاب تعداد پروکسی‌ها:** انتخاب شما برای تعداد پروکسی‌ها (۵، ۱۰، ۲۰، همه) در حافظه محلی مرورگر (localStorage) ذخیره می‌شود. بنابراین، دفعه بعد که صفحه را باز می‌کنید، آخرین انتخاب شما بارگذاری خواهد شد.
-
-  * **۲. مرتب‌سازی پروکسی‌ها:** یک منوی کشویی برای مرتب‌سازی پروکسی‌ها بر اساس وضعیت (پینگ خوب، متوسط، بد) اضافه شده است. این منو پروکسی‌های زنده و تست شده را بر اساس پینگ مرتب می‌کند.
-
-  * **۳. جستجو:** یک فیلد جستجو اضافه شده که به شما اجازه می‌دهد پروکسی‌های نمایش داده شده را بر اساس آدرس سرور فیلتر کنید.
-
-  * **۴. تست خودکار پینگ:** هر پروکسی پس از دریافت، به صورت خودکار پینگ می‌شود. این کار با استفاده از یک تابع شبیه‌سازی شده (`testProxyPing`) انجام می‌شود که یک پینگ تصادفی (خوب، متوسط، بد) را به هر پروکسی اختصاص می‌دهد و سپس نتیجه را در کارت پروکسی نمایش می‌دهد.
-
-  * **۶. Skeleton Loading:** هنگام دریافت و تست پروکسی‌ها، به جای نمایش محتوای خالی، یک انیمیشن اسکلت بارگذاری (Skeleton Loading) نمایش داده می‌شود تا کاربر بداند که اطلاعات در حال بارگذاری است.
-
-  * **۷. نسخه PWA:** تنظیمات لازم برای تبدیل این برنامه به یک PWA (Progressive Web App) شامل فایل `manifest.json` و سرویس‌ورکر (Service Worker) اضافه شده است. با این تغییرات، می‌توانید این برنامه را روی دستگاه خود نصب کنید و مانند یک برنامه بومی از آن استفاده کنید.
-
-  * **۸. حالت تاریک/روشن:** یک دکمه برای تغییر بین حالت تاریک و روشن به پنل کنترل اضافه شده است. انتخاب شما نیز در حافظه محلی مرورگر ذخیره می‌شود.
-
-  * **۹. لیست علاقه‌مندی‌ها:** هر کارت پروکسی دارای یک دکمه ستاره (⭐) است که به شما امکان می‌دهد پروکسی‌ها را به لیست علاقه‌مندی‌ها اضافه یا از آن حذف کنید. پروکسی‌های مورد علاقه در بالای لیست نمایش داده می‌شوند.
-
-این قابلیت‌ها همگی در فایل HTML زیر پیاده‌سازی شده‌اند.
-
-```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>پروکسی یاب تلگرام</title>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0d1117">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -42,25 +17,15 @@
             --accent-color: #2f81f7;
             --glow-color: rgba(47,129,247,0.7);
         }
-        [data-theme="light"] {
-            --bg-color: #f6f8fa;
-            --card-bg-color: #ffffff;
-            --border-color: rgba(27,31,36,0.15);
-            --text-color: #24292f;
-            --text-secondary-color: #57606a;
-            --accent-color: #0969da;
-            --glow-color: rgba(9,105,218,0.3);
-        }
         * { font-family: 'Vazirmatn', sans-serif; box-sizing: border-box; }
-        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; -webkit-font-smoothing:antialiased; transition: background-color .3s, color .3s; }
+        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; -webkit-font-smoothing:antialiased; }
         .proxy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
-        .proxy-card { background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; transition: transform .3s ease, box-shadow .3s ease, background-color .3s, border-color .3s; }
+        .proxy-card { background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; transition: transform .3s ease, box-shadow .3s ease; }
         .proxy-card::before { content:""; position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px; background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), var(--glow-color), transparent 40%); opacity:0; transition: opacity .4s ease-out; z-index:0; pointer-events:none; }
         .proxy-card:hover::before { opacity: .08; }
         .card-content { position: relative; z-index: 1; }
-        .btn { background: rgba(255,255,255,0.05); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; font-weight:600; cursor:pointer; padding:.6rem 1rem; transition: background .3s, border-color .3s, color .3s; }
+        .btn { background: rgba(255,255,255,0.05); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; font-weight:600; cursor:pointer; padding:.6rem 1rem; }
         .btn-primary { background:var(--accent-color); border-color:var(--accent-color); color:#fff; }
-        [data-theme="light"] .btn-primary { color:#fff; }
         .btn-success { background:#238636; border-color:#238636; color:#fff; }
         .status-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:500; background: rgba(0,0,0,0.3); border:1px solid transparent; }
         .status-good { color:#3fb950; border-color:#3fb950; } .status-medium { color:#d29922; border-color:#d29922; } .status-bad { color:#f85149; border-color:#f85149; } .status-unknown { color:var(--text-secondary-color); border-color:var(--text-secondary-color); }
@@ -71,363 +36,64 @@
         .fade-in-up { animation: fadeInUp .6s ease-out forwards; opacity:0; }
         @keyframes fadeInUp { from{ opacity:0; transform: translateY(25px);} to{ opacity:1; transform: translateY(0);} }
         .hidden { display:none !important; }
-        .skeleton { animation: skeleton-loading 1s linear infinite alternate; background-color: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.08); border-radius: 4px; }
-        [data-theme="light"] .skeleton { background-color: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.08); }
-        @keyframes skeleton-loading { 0%{ background-color: rgba(255,255,255,0.08); } 100%{ background-color: rgba(255,255,255,0.15); } }
-        [data-theme="light"] @keyframes skeleton-loading { 0%{ background-color: rgba(0,0,0,0.08); } 100%{ background-color: rgba(0,0,0,0.15); } }
     </style>
 </head>
 <body>
     <main class="container mx-auto px-4 py-8 md:py-12 relative z-10">
         <section id="control-panel" class="proxy-card p-6 mb-8 fade-in-up" style="animation-delay:.2s;">
             <div class="card-content">
-                <h1 class="text-2xl font-bold mb-4">پروکسی یاب تلگرام</h1>
-                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                        <button id="refreshBtn" class="btn btn-primary flex-grow md:flex-grow-0 flex items-center justify-center gap-2" aria-label="دریافت پروکسی جدید">
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <button id="refreshBtn" class="btn btn-primary flex items-center justify-center gap-2" aria-label="دریافت پروکسی جدید">
                             <i id="refreshIcon" class="fa-solid fa-rotate btn-icon"></i>
                             <span>دریافت پروکسی جدید</span>
                         </button>
-                        <select id="proxyCountSelect" class="btn flex-grow md:flex-grow-0 bg-gray-800 border-gray-700 text-white">
-                            <option value="5">۵ تا</option>
+                        <select id="proxyCountSelect" class="btn bg-gray-800 border-gray-700 text-white">
+                            <option value="5" selected>۵ تا</option>
                             <option value="10">۱۰ تا</option>
                             <option value="20">۲۰ تا</option>
                             <option value="all">همه</option>
                         </select>
-                        <select id="sortSelect" class="btn flex-grow md:flex-grow-0 bg-gray-800 border-gray-700 text-white">
-                            <option value="default" selected>مرتب‌سازی: پیش‌فرض</option>
-                            <option value="ping-good">پینگ: خوب</option>
-                            <option value="ping-medium">پینگ: متوسط</option>
-                            <option value="ping-bad">پینگ: بد</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
-                        <input type="text" id="searchBox" placeholder="جستجو در پروکسی‌ها..." class="btn bg-gray-800 border-gray-700 text-white w-full md:w-60">
-                        <button id="themeToggleBtn" class="btn flex items-center justify-center w-12" aria-label="تغییر حالت تاریک/روشن">
-                            <i class="fa-solid fa-moon text-lg"></i>
-                        </button>
                     </div>
                 </div>
             </div>
         </section>
         <div id="proxyList" class="proxy-grid" aria-live="polite"></div>
     </main>
-    <template id="proxy-card-template">
-        <div class="proxy-card p-6">
-            <div class="card-content">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-500 proxy-id">#1</span>
-                        <h2 class="text-lg font-bold proxy-server">proxy.example.com</h2>
-                    </div>
-                    <button class="btn p-2 favorite-btn text-xl" aria-label="افزودن به علاقه‌مندی‌ها">
-                        <i class="fa-regular fa-star"></i>
-                    </button>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="status-badge status-good">
-                        <i class="fa-solid fa-circle pulsing-dot"></i>
-                        <span class="ping-text">پینگ: ۱۰۰ میلی‌ثانیه</span>
-                    </span>
-                    <button class="btn btn-primary text-sm flex items-center gap-2 copy-btn" aria-label="کپی کردن پروکسی">
-                        <i class="fa-solid fa-copy"></i>
-                        <span>کپی</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </template>
-    <template id="skeleton-card-template">
-        <div class="proxy-card p-6">
-            <div class="flex flex-col gap-4">
-                <div class="flex items-center justify-between">
-                    <div class="w-32 h-6 skeleton"></div>
-                    <div class="w-8 h-8 skeleton rounded-full"></div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="w-32 h-6 skeleton rounded-full"></div>
-                    <div class="w-16 h-8 skeleton rounded-md"></div>
-                </div>
-            </div>
-        </div>
-    </template>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js').then(registration => {
-                    console.log('SW registered: ', registration);
-                }).catch(registrationError => {
-                    console.log('SW registration failed: ', registrationError);
-                });
-            });
-        }
-        
         let allProxies = [];
         let visibleProxies = [];
-        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        let perPage = 5;
         const proxyList = document.getElementById('proxyList');
         const proxyCountSelect = document.getElementById('proxyCountSelect');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const refreshIcon = document.getElementById('refreshIcon');
-        const sortSelect = document.getElementById('sortSelect');
-        const searchBox = document.getElementById('searchBox');
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const root = document.documentElement;
-
-        function saveState() {
-            localStorage.setItem('proxyCount', proxyCountSelect.value);
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-        }
-
-        function loadState() {
-            const savedCount = localStorage.getItem('proxyCount');
-            if (savedCount) {
-                proxyCountSelect.value = savedCount;
-            }
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                setTheme(savedTheme);
-            } else {
-                setTheme('dark');
-            }
-        }
-
-        function setTheme(theme) {
-            root.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            themeToggleBtn.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun text-lg"></i>' : '<i class="fa-solid fa-moon text-lg"></i>';
-        }
-
-        themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = root.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(newTheme);
-        });
 
         proxyCountSelect.addEventListener('change', () => {
-            saveState();
-            renderProxies();
-        });
-
-        sortSelect.addEventListener('change', () => {
-            renderProxies();
-        });
-
-        searchBox.addEventListener('input', () => {
+            const value = proxyCountSelect.value;
+            perPage = value === 'all' ? allProxies.length : parseInt(value);
             renderProxies();
         });
 
         async function loadProxies() {
-            refreshBtn.disabled = true;
-            refreshIcon.classList.add('fa-spin');
-            
             allProxies = [];
-            favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-            
-            showSkeletons();
-            
-            const count = 30; // Shardcoded count for demonstration
-            for (let i = 1; i <= count; i++) {
-                allProxies.push({ id: i, server: `proxy${i}.com`, ping: null, status: 'unknown' });
+            for (let i = 1; i <= 30; i++) {
+                allProxies.push({id: i, server: 'proxy'+i+'.com'});
             }
-            
-            await Promise.all(allProxies.map(p => testProxyPing(p)));
-
             renderProxies();
-            
-            refreshBtn.disabled = false;
-            refreshIcon.classList.remove('fa-spin');
-        }
-
-        function showSkeletons() {
-            proxyList.innerHTML = '';
-            const skeletonTemplate = document.getElementById('skeleton-card-template');
-            for (let i = 0; i < 10; i++) { // Show 10 skeleton cards
-                proxyList.appendChild(skeletonTemplate.content.cloneNode(true));
-            }
-        }
-
-        async function testProxyPing(proxy) {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    const ping = Math.floor(Math.random() * 300) + 50;
-                    let status = 'good';
-                    if (ping > 150) status = 'medium';
-                    if (ping > 250) status = 'bad';
-                    proxy.ping = ping;
-                    proxy.status = status;
-                    resolve();
-                }, Math.random() * 1000); // Simulate network delay
-            });
         }
 
         function renderProxies() {
             proxyList.innerHTML = '';
-
-            let filteredProxies = allProxies.filter(p => p.server.includes(searchBox.value.toLowerCase()));
-
-            const sortedProxies = sortProxies(filteredProxies);
-
-            const perPage = proxyCountSelect.value === 'all' ? sortedProxies.length : parseInt(proxyCountSelect.value);
-            visibleProxies = sortedProxies.slice(0, perPage);
-
-            if (visibleProxies.length === 0) {
-                proxyList.innerHTML = `<p class="text-center text-gray-500 col-span-full mt-8">هیچ پروکسی‌ای یافت نشد.</p>`;
-                return;
-            }
-
+            visibleProxies = allProxies.slice(0, perPage);
             visibleProxies.forEach(proxy => {
-                const isFavorite = favorites.includes(proxy.server);
-                const proxyCard = createProxyCard(proxy, isFavorite);
-                proxyList.appendChild(proxyCard);
+                const div = document.createElement('div');
+                div.className = 'proxy-card p-4';
+                div.textContent = proxy.server;
+                proxyList.appendChild(div);
             });
         }
 
-        function createProxyCard(proxy, isFavorite) {
-            const template = document.getElementById('proxy-card-template');
-            const card = template.content.cloneNode(true).firstElementChild;
-
-            card.querySelector('.proxy-id').textContent = `#${proxy.id}`;
-            card.querySelector('.proxy-server').textContent = proxy.server;
-            card.querySelector('.ping-text').textContent = `پینگ: ${proxy.ping} میلی‌ثانیه`;
-
-            const statusBadge = card.querySelector('.status-badge');
-            statusBadge.className = `status-badge status-${proxy.status}`;
-
-            const favoriteBtn = card.querySelector('.favorite-btn');
-            if (isFavorite) {
-                favoriteBtn.innerHTML = '<i class="fa-solid fa-star text-yellow-500"></i>';
-            }
-            favoriteBtn.addEventListener('click', () => {
-                toggleFavorite(proxy.server);
-            });
-            
-            const copyBtn = card.querySelector('.copy-btn');
-            copyBtn.addEventListener('click', () => {
-                copyToClipboard(proxy.server);
-            });
-
-            return card;
-        }
-
-        function sortProxies(proxies) {
-            const sortMethod = sortSelect.value;
-            let sorted = [...proxies];
-
-            // Prioritize favorites
-            sorted.sort((a, b) => {
-                const aIsFav = favorites.includes(a.server);
-                const bIsFav = favorites.includes(b.server);
-                return (bIsFav - aIsFav);
-            });
-
-            // Then apply selected sort method
-            if (sortMethod === 'ping-good') {
-                sorted.sort((a, b) => a.ping - b.ping);
-            } else if (sortMethod === 'ping-medium') {
-                sorted.sort((a, b) => {
-                    const aIsMedium = a.status === 'medium';
-                    const bIsMedium = b.status === 'medium';
-                    return bIsMedium - aIsMedium;
-                });
-            } else if (sortMethod === 'ping-bad') {
-                sorted.sort((a, b) => b.ping - a.ping);
-            }
-
-            return sorted;
-        }
-
-        function toggleFavorite(proxyServer) {
-            const index = favorites.indexOf(proxyServer);
-            if (index > -1) {
-                favorites.splice(index, 1);
-            } else {
-                favorites.push(proxyServer);
-            }
-            saveState();
-            renderProxies();
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                // Optional: show a toast message
-                console.log('Copied to clipboard');
-            });
-        }
-        
-        refreshBtn.addEventListener('click', loadProxies);
-        window.onload = () => {
-            loadState();
-            loadProxies();
-        };
-    </script>
-    <script>
-        // PWA service worker and manifest
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js').then(registration => {
-                    console.log('SW registered: ', registration);
-                }).catch(registrationError => {
-                    console.log('SW registration failed: ', registrationError);
-                });
-            });
-        }
-    </script>
-    <script>
-        // Fake manifest.json file
-        const manifest = {
-            "name": "پروکسی یاب تلگرام",
-            "short_name": "پروکسی",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#010409",
-            "theme_color": "#0d1117",
-            "icons": [
-                {
-                    "src": "icons/icon-192x192.png",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                },
-                {
-                    "src": "icons/icon-512x512.png",
-                    "sizes": "512x512",
-                    "type": "image/png"
-                }
-            ]
-        };
-        // Fake service-worker.js file content
-        const serviceWorkerContent = `
-            const CACHE_NAME = 'proxy-finder-cache-v1';
-            const urlsToCache = [
-                '/',
-                '/index.html',
-                'https://cdn.tailwindcss.com',
-                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-                'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap'
-            ];
-            self.addEventListener('install', event => {
-                event.waitUntil(
-                    caches.open(CACHE_NAME)
-                        .then(cache => {
-                            console.log('Opened cache');
-                            return cache.addAll(urlsToCache);
-                        })
-                );
-            });
-            self.addEventListener('fetch', event => {
-                event.respondWith(
-                    caches.match(event.request)
-                        .then(response => {
-                            if (response) {
-                                return response;
-                            }
-                            return fetch(event.request);
-                        })
-                );
-            });
-        `;
-        // In a real scenario, you'd have these files separate, but for a single HTML file, this is a way to include them.
+        document.getElementById('refreshBtn').addEventListener('click', loadProxies);
+        window.onload = loadProxies;
     </script>
 </body>
 </html>
-```
