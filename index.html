@@ -390,6 +390,9 @@
                 <p class="flex items-center justify-center gap-x-2 flex-wrap">
                     <span>&copy; 1404 پروکسی یاب تلگرام. تمامی حقوق محفوظ است.</span>
                     <span class="bg-sky-500/10 text-sky-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-sky-500/20">نسخه 1.1</span>
+                    <button id="unregisterBtn" class="bg-red-500/10 text-red-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-red-500/20 transition-all duration-300 hover:bg-red-500/20">
+                        <i class="fa-solid fa-trash-can ml-1"></i> حذف Service Worker
+                    </button>
                 </p>
             </div>
         </div>
@@ -694,6 +697,23 @@
         elements.refreshBtn.addEventListener('click', loadProxies);
         elements.testAllBtn.addEventListener('click', testAllProxies);
         elements.loadMoreBtn.addEventListener('click', loadMoreProxies);
+
+        // New button logic to unregister service worker
+        document.getElementById('unregisterBtn').addEventListener('click', () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                    }
+                    showToastNotification('✅ Service Worker حذف شد! لطفاً صفحه را رفرش کنید.', 'success');
+                }).catch(err => {
+                    console.error('Failed to unregister service worker:', err);
+                    showToastNotification('❌ خطا در حذف Service Worker.', 'error');
+                });
+            } else {
+                showToastNotification('❌ Service Worker در این مرورگر پشتیبانی نمی‌شود.', 'error');
+            }
+        });
 
         window.addEventListener('load', () => {
             loadProxies();
