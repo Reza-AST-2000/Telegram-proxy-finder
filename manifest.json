@@ -1,0 +1,31 @@
+{
+  "name": "پروکسی یاب تلگرام",
+  "short_name": "پروکسی یاب",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#010409",
+  "theme_color": "#2f81f7",
+  "description": "ابزار یافتن و تست پروکسی‌های پرسرعت MTProto برای تلگرام",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/icons/logo-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/icons/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/icons/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/icons/logo-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ]
+}
