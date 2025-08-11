@@ -31,18 +31,20 @@
 
         /* Light theme variables */
         :root.light-theme {
-            --bg-color: #f0f2f5;
+            /* Modified for a soft sea blue theme */
+            --bg-color: #eaf7ff;
             --card-bg-color: #ffffff;
-            --border-color: #e0e0e0;
-            --text-color: #212529;
-            --text-secondary-color: #6c757d;
+            --border-color: #a0c0e0;
+            --text-color: #2a3848;
+            --text-secondary-color: #5c6778;
             --accent-color: #007bff;
             --success-color: #28a745;
             --warning-color: #ffc107;
             --danger-color: #dc3545;
             --glow-color: rgba(0, 123, 255, 0.5);
         }
-
+        
+        /* فونت و تنظیمات کلی */
         * {
             font-family: 'Vazirmatn', sans-serif;
             box-sizing: border-box;
@@ -55,12 +57,14 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        /* چیدمان کارت‌های پروکسی */
         .proxy-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
             gap: 24px;
         }
 
+        /* استایل کارت‌های پروکسی */
         .proxy-card {
             background-color: var(--card-bg-color);
             border: 1px solid var(--border-color);
@@ -104,6 +108,7 @@
             z-index: 1;
         }
 
+        /* استایل دکمه‌ها */
         .btn {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-color);
@@ -129,6 +134,7 @@
         .btn-success { background: var(--success-color); border-color: var(--success-color); color: #fff; }
         .btn-success:hover { background: #2ea043; box-shadow: 0 0 15px rgba(35, 134, 54, 0.5); }
 
+        /* نشان وضعیت پروکسی */
         .status-badge {
             display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
             border-radius: 20px; font-size: 12px; font-weight: 500;
@@ -142,12 +148,14 @@
         .status-bad { color: #f85149; border-color: #f85149; }
         .status-unknown { color: var(--text-secondary-color); border-color: var(--text-secondary-color); }
 
+        /* انیمیشن نقطه چشمک‌زن */
         .pulsing-dot { animation: pulse 2s infinite; }
         @keyframes pulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7); }
             50% { box-shadow: 0 0 0 8px rgba(63, 185, 80, 0); }
         }
 
+        /* انیمیشن لودینگ */
         .loading-spinner {
             width: 20px; height: 20px; border: 2px solid var(--border-color);
             border-radius: 50%; border-top-color: var(--accent-color);
@@ -156,13 +164,14 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* انیمیشن نمایش کارت‌ها */
         .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(25px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Welcome Modal Styles */
+        /* استایل مودال خوش‌آمدگویی */
         .welcome-modal-overlay {
             position: fixed;
             top: 0;
@@ -180,7 +189,7 @@
             transition: opacity 0.4s ease;
             padding: 1rem;
         }
-        .light-theme .welcome-modal-overlay { background-color: rgba(240, 242, 245, 0.8); }
+        .light-theme .welcome-modal-overlay { background-color: rgba(234, 247, 255, 0.8); }
 
         .welcome-modal-overlay:not(.hidden) { opacity: 1; }
 
@@ -299,7 +308,7 @@
         .light-theme .form-control { color: var(--text-color); }
         .light-theme .form-control:focus { box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); }
 
-        /* Theme Toggle Button */
+        /* دکمه تغییر تم */
         .theme-toggle-btn {
             background: none;
             border: none;
@@ -314,7 +323,7 @@
             color: var(--accent-color);
         }
 
-        /* Skeleton Loading Styles */
+        /* استایل لودینگ اسکلتون */
         .skeleton-card {
             background-color: var(--card-bg-color);
             border: 1px solid var(--border-color);
@@ -332,19 +341,28 @@
         }
         .light-theme .skeleton-line { background-color: #adb5bd; }
 
-        .skeleton-line:last-child {
-            margin-bottom: 0;
-        }
-        .skeleton-line.w-75 { width: 75%; }
-        .skeleton-line.w-50 { width: 50%; }
-
         @keyframes skeleton-loading {
             0% { opacity: 0.7; }
             100% { opacity: 0.4; }
         }
 
-        @media (max-width: 768px) { .proxy-grid { grid-template-columns: 1fr; } }
+        /* واکنش‌گرا کردن برای موبایل */
+        @media (max-width: 768px) {
+            .proxy-grid { grid-template-columns: 1fr; }
+            .control-row { flex-direction: column; align-items: stretch; gap: 16px; }
+            .control-panel .flex-col.md\:flex-row { flex-direction: column; align-items: center; }
+            .control-panel .flex.gap-6 { width: 100%; justify-content: space-around; }
+        }
+        
+        @media (min-width: 768px) {
+            .control-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1rem;
+            }
+        }
 
+        /* استایل اسکرول‌بار */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: #21262d; border-radius: 4px; border: 1px solid #30363d;}
@@ -377,7 +395,7 @@
                 <div class="inline-block p-4 bg-gray-900/50 rounded-full border border-gray-800 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20">
                     <i class="fa-solid fa-user-secret text-4xl text-white"></i>
                 </div>
-                <!-- Theme Toggle Button -->
+                <!-- دکمه تغییر تم -->
                 <button id="themeToggle" class="theme-toggle-btn">
                     <i id="themeIcon" class="fa-solid fa-moon"></i>
                 </button>
@@ -420,7 +438,7 @@
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="control-grid grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="relative flex items-center">
                         <i class="fa-solid fa-magnifying-glass absolute right-4 text-slate-500"></i>
                         <input type="text" id="searchInput" class="form-control pr-12 text-base" placeholder="جستجو بر اساس سرور یا کشور..." />
@@ -431,6 +449,18 @@
                             <option value="ping">مرتب‌سازی: پینگ کمتر</option>
                             <option value="country">مرتب‌سازی: بر اساس کشور</option>
                             <option value="status">مرتب‌سازی: بر اساس وضعیت</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                    </div>
+                    <div class="relative">
+                        <select id="perPageSelect" class="form-control text-base pl-8 appearance-none">
+                            <option value="5" selected>تعداد نمایش: 5</option>
+                            <option value="10">تعداد نمایش: 10</option>
+                            <option value="15">تعداد نمایش: 15</option>
+                            <option value="20">تعداد نمایش: 20</option>
+                            <option value="30">تعداد نمایش: 30</option>
+                            <option value="40">تعداد نمایش: 40</option>
+                            <option value="50">تعداد نمایش: 50</option>
                         </select>
                         <i class="fa-solid fa-chevron-down absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
                     </div>
@@ -447,10 +477,6 @@
 
         <!-- Skeleton Loading Cards -->
         <div id="skeletonList" class="proxy-grid">
-            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
-            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
-            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
-            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
             <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
             <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
             <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
@@ -539,23 +565,22 @@
         // Theme Toggle Functionality
         const themeToggleBtn = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
-        const body = document.body;
-
-        // Sets the theme on the body and stores it in localStorage
+        
+        // تابع برای اعمال تم به سند و ذخیره آن در حافظه
         const setTheme = (theme) => {
             if (theme === 'dark') {
-                body.classList.remove('light-theme');
+                document.documentElement.classList.remove('light-theme');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
             } else {
-                body.classList.add('light-theme');
+                document.documentElement.classList.add('light-theme');
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
             }
             localStorage.setItem('theme', theme);
         };
 
-        // Gets the theme from localStorage or system preference
+        // تابع برای دریافت تم مورد نظر از حافظه یا تنظیمات سیستم
         const getPreferredTheme = () => {
             const storedTheme = localStorage.getItem('theme');
             if (storedTheme) {
@@ -564,11 +589,9 @@
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         };
 
-        // Apply the theme on page load
         const currentTheme = getPreferredTheme();
         setTheme(currentTheme);
 
-        // Add event listener to the toggle button
         themeToggleBtn.addEventListener('click', () => {
             const activeTheme = localStorage.getItem('theme');
             const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
@@ -580,7 +603,7 @@
         let allProxies = [];
         let visibleProxies = [];
         let isLoading = false;
-        const perPage = 9;
+        let perPage = 5;
         let currentPage = 0;
         let currentSort = 'default';
         let currentSearch = '';
@@ -594,12 +617,13 @@
             activeCount: document.getElementById('activeCount'),
             status: document.getElementById('status'),
             proxyList: document.getElementById('proxyList'),
-            skeletonList: document.getElementById('skeletonList'), // New element for skeleton
+            skeletonList: document.getElementById('skeletonList'),
             noResults: document.getElementById('noResults'),
             loadMoreContainer: document.getElementById('loadMoreContainer'),
             loadMoreBtn: document.getElementById('loadMoreBtn'),
             searchInput: document.getElementById('searchInput'),
             sortSelect: document.getElementById('sortSelect'),
+            perPageSelect: document.getElementById('perPageSelect')
         };
 
         const countryTranslations = {
@@ -615,7 +639,6 @@
             if (isLoading) return;
             setLoadingState(true);
             
-            // Show skeleton loading cards before fetching
             elements.skeletonList.classList.remove('hidden');
             elements.proxyList.classList.add('hidden');
 
@@ -636,7 +659,6 @@
                 ];
                 showToastNotification('⚠️ از لیست پیش‌فرض استفاده می‌شود.', 'warning');
             } finally {
-                // Hide skeleton and show actual list after fetching
                 elements.skeletonList.classList.add('hidden');
                 elements.proxyList.classList.remove('hidden');
 
@@ -652,7 +674,6 @@
         const applyFiltersAndSort = () => {
             let filtered = [...allProxies];
             
-            // Search filter
             if (currentSearch) {
                 const searchTerm = currentSearch.toLowerCase();
                 filtered = filtered.filter(p =>
@@ -661,7 +682,6 @@
                 );
             }
             
-            // Sort
             switch (currentSort) {
                 case 'ping':
                     filtered.sort((a, b) => (a.ping === null) - (b.ping === null) || a.ping - b.ping);
@@ -914,6 +934,11 @@
         
         elements.sortSelect.addEventListener('change', (e) => {
             currentSort = e.target.value;
+            applyFiltersAndSort();
+        });
+        
+        elements.perPageSelect.addEventListener('change', (e) => {
+            perPage = parseInt(e.target.value);
             applyFiltersAndSort();
         });
 
