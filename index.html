@@ -255,8 +255,23 @@
         .hidden {
             display: none !important;
         }
-
-
+        
+        .form-control {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: var(--text-color);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.3);
+        }
+        
         @media (max-width: 768px) { .proxy-grid { grid-template-columns: 1fr; } }
 
         ::-webkit-scrollbar { width: 8px; }
@@ -296,7 +311,7 @@
 
         <section id="control-panel" class="proxy-card p-6 mb-8 fade-in-up" style="animation-delay: 0.2s;">
             <div class="card-content">
-                <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-between mb-6">
                     <button id="refreshBtn" class="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold flex items-center justify-center gap-2">
                         <i id="refreshIcon" class="fa-solid fa-rotate btn-icon transition-transform duration-300"></i>
                         <span>دریافت پروکسی جدید</span>
@@ -323,6 +338,22 @@
                         <span>نصب برنامه</span>
                     </button>
                 </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="relative flex items-center">
+                        <i class="fa-solid fa-magnifying-glass absolute right-4 text-slate-500"></i>
+                        <input type="text" id="searchInput" class="form-control pr-12 text-base" placeholder="جستجو بر اساس سرور یا کشور..." />
+                    </div>
+                    <div class="relative">
+                        <select id="sortSelect" class="form-control text-base pl-8 appearance-none">
+                            <option value="default" selected>مرتب‌سازی: پیش‌فرض</option>
+                            <option value="ping">مرتب‌سازی: پینگ کمتر</option>
+                            <option value="country">مرتب‌سازی: بر اساس کشور</option>
+                            <option value="status">مرتب‌سازی: بر اساس وضعیت</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -337,7 +368,7 @@
 
         <div id="loadMoreContainer" class="text-center mt-8 hidden">
             <button id="loadMoreBtn" class="btn px-8 py-3 text-base font-semibold">
-                <i class="fa-solid fa-chevron-down mr-2 btn-icon"></i> نمایش بیشتر
+                <i class="fa-solid fa-chevron-down ml-2 btn-icon"></i> نمایش بیشتر
             </button>
         </div>
 
@@ -413,6 +444,9 @@
         let visibleProxies = [];
         let isLoading = false;
         const perPage = 9;
+        let currentPage = 0;
+        let currentSort = 'default';
+        let currentSearch = '';
 
         const elements = {
             refreshBtn: document.getElementById('refreshBtn'),
@@ -425,6 +459,8 @@
             noResults: document.getElementById('noResults'),
             loadMoreContainer: document.getElementById('loadMoreContainer'),
             loadMoreBtn: document.getElementById('loadMoreBtn'),
+            searchInput: document.getElementById('searchInput'),
+            sortSelect: document.getElementById('sortSelect'),
         };
 
         const countryTranslations = {
@@ -457,22 +493,56 @@
                 ];
                 showToastNotification('⚠️ از لیست پیش‌فرض استفاده می‌شود.', 'warning');
             } finally {
-                visibleProxies = allProxies.slice(0, perPage);
-                renderProxies();
+                applyFiltersAndSort();
                 updateCounts();
-                updateLoadMoreButton();
                 setLoadingState(false);
+                if (allProxies.length > 0) {
+                     testAllProxiesAuto();
+                }
             }
         };
 
+        const applyFiltersAndSort = () => {
+            let filtered = [...allProxies];
+            
+            // Search filter
+            if (currentSearch) {
+                const searchTerm = currentSearch.toLowerCase();
+                filtered = filtered.filter(p =>
+                    p.server.toLowerCase().includes(searchTerm) ||
+                    p.country.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Sort
+            switch (currentSort) {
+                case 'ping':
+                    filtered.sort((a, b) => (a.ping === null) - (b.ping === null) || a.ping - b.ping);
+                    break;
+                case 'country':
+                    filtered.sort((a, b) => a.country.localeCompare(b.country));
+                    break;
+                case 'status':
+                    const statusOrder = { 'good': 1, 'medium': 2, 'bad': 3, 'unknown': 4 };
+                    filtered.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+                    break;
+            }
+            
+            visibleProxies = filtered;
+            currentPage = 0;
+            renderProxies();
+            updateLoadMoreButton();
+        };
+
         const renderProxies = () => {
+            const proxiesToRender = visibleProxies.slice(0, (currentPage + 1) * perPage);
             elements.proxyList.innerHTML = '';
-            if (visibleProxies.length === 0 && !isLoading) {
+            if (proxiesToRender.length === 0) {
                 elements.noResults.classList.remove('hidden'); return;
             }
             elements.noResults.classList.add('hidden');
 
-            visibleProxies.forEach((proxy, index) => {
+            proxiesToRender.forEach((proxy, index) => {
                 const card = document.createElement('div');
                 card.className = 'proxy-card fade-in-up';
                 card.style.animationDelay = `${index * 0.05}s`;
@@ -520,7 +590,8 @@
             const proxy = allProxies.find(p => p.id === proxyId);
             if (!proxy) return;
             
-            document.getElementById(`ping-${proxyId}`).innerHTML = '<div class="loading-spinner !w-4 !h-4"></div>';
+            const pingElement = document.getElementById(`ping-${proxyId}`);
+            if (pingElement) pingElement.innerHTML = '<div class="loading-spinner !w-4 !h-4"></div>';
 
             const simulatedDelay = Math.random() * 800 + 50;
             await new Promise(resolve => setTimeout(resolve, simulatedDelay));
@@ -543,6 +614,17 @@
             showToastNotification('✅ تست همه پروکسی‌های نمایش داده شده کامل شد.', 'success');
         };
 
+        const testAllProxiesAuto = async () => {
+            const proxiesToTest = [...allProxies];
+            for (let i = 0; i < proxiesToTest.length; i++) {
+                await testPing(proxiesToTest[i].id);
+                // Wait a bit before testing the next one to avoid issues
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            applyFiltersAndSort();
+            showToastNotification('✅ تست خودکار پینگ همه پروکسی‌ها به پایان رسید.', 'success');
+        };
+
         const copyProxy = (proxyId) => {
             const proxy = allProxies.find(p => p.id === proxyId);
             const proxyUrl = `tg://proxy?server=${proxy.server}&port=${proxy.port}&secret=${proxy.secret}`;
@@ -562,7 +644,11 @@
             elements.refreshBtn.disabled = state;
             elements.refreshIcon.classList.toggle('fa-spin', state);
             elements.status.classList.toggle('hidden', !state);
-            if (state) elements.proxyList.innerHTML = '';
+            if (state) {
+                elements.proxyList.innerHTML = '';
+                elements.noResults.classList.add('hidden');
+                elements.loadMoreContainer.classList.add('hidden');
+            }
         };
         
         const updateCard = (proxyId) => {
@@ -602,15 +688,14 @@
         };
 
         const loadMoreProxies = () => {
-            const currentLength = visibleProxies.length;
-            const newProxies = allProxies.slice(currentLength, currentLength + perPage);
-            visibleProxies.push(...newProxies);
+            currentPage++;
             renderProxies();
             updateLoadMoreButton();
         };
 
         const updateLoadMoreButton = () => {
-            elements.loadMoreContainer.classList.toggle('hidden', visibleProxies.length >= allProxies.length);
+            const visibleCount = (currentPage + 1) * perPage;
+            elements.loadMoreContainer.classList.toggle('hidden', visibleCount >= visibleProxies.length);
         };
         
         // General Toast Notification for app events
@@ -636,7 +721,6 @@
         const closeWelcomeModalBtn = document.getElementById('closeWelcomeModal');
 
         const showWelcomeModal = () => {
-            // Check if the user has seen the modal before in this session
             if (sessionStorage.getItem('welcomeModalSeen')) {
                 return;
             }
@@ -657,7 +741,6 @@
                 };
                 welcomeModal.addEventListener('transitionend', onTransitionEnd);
             }
-            // Remember that the user has seen the modal for this session
             sessionStorage.setItem('welcomeModalSeen', 'true');
         };
 
@@ -665,7 +748,6 @@
             closeWelcomeModalBtn.addEventListener('click', hideWelcomeModal);
         }
 
-        // Close the modal if the user clicks on the overlay
         if (welcomeModal) {
             welcomeModal.addEventListener('click', (e) => {
                 if (e.target === welcomeModal) {
@@ -678,10 +760,19 @@
         elements.refreshBtn.addEventListener('click', loadProxies);
         elements.testAllBtn.addEventListener('click', testAllProxies);
         elements.loadMoreBtn.addEventListener('click', loadMoreProxies);
+        
+        elements.searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            applyFiltersAndSort();
+        });
+        
+        elements.sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            applyFiltersAndSort();
+        });
 
         window.addEventListener('load', () => {
             loadProxies();
-            // Show the welcome modal after a short delay
             setTimeout(showWelcomeModal, 700);
         });
     </script>
