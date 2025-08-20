@@ -1,33 +1,47 @@
-const CACHE_NAME = 'tg-proxy-finder-v1';
-const urlsToCache = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    'https://cdn.tailwindcss.com',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-    'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap'
-    // Add paths to your icons here
-];
+// sw.js
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
 
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                return cache.addAll(urlsToCache);
-            })
-    );
-});
+if (workbox) {
+  console.log(`Yay! Workbox is loaded 🎉`);
 
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // If the resource is in the cache, return it
-                if (response) {
-                    return response;
-                }
-                // Otherwise, fetch it from the network
-                return fetch(event.request);
-            })
-    );
-});
+  // Cache صفحات و فایل‌های استاتیک (HTML, CSS, JS, Images)
+  workbox.routing.registerRoute(
+    ({request}) => request.destination === 'document' || 
+                   request.destination === 'script' || 
+                   request.destination === 'style' || 
+                   request.destination === 'image' || 
+                   request.destination === 'font',
+    new workbox.strategies.StaleWhileRevalidate({
+      cacheName: 'static-resources',
+    })
+  );
+
+  // کش کردن درخواست پروکسی‌ها (API)
+  workbox.routing.registerRoute(
+    ({url}) => url.href.includes('mtproto.json'),
+    new workbox.strategies.NetworkFirst({
+      cacheName: 'proxies-cache',
+      networkTimeoutSeconds: 5,
+      plugins: [
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 50,
+          maxAgeSeconds: 60 * 30, // ۳۰ دقیقه
+        }),
+      ],
+    })
+  );
+
+  // صفحه fallback آفلاین
+  const FALLBACK_HTML_URL = '/offline.html';
+  workbox.precaching.precacheAndRoute([{url: FALLBACK_HTML_URL, revision: null}]);
+
+  workbox.routing.setCatchHandler(async ({event}) => {
+    if (event.request.destination === 'document') {
+      return caches.match(FALLBACK_HTML_URL);
+    }
+    return Response.error();
+  });
+
+} else {
+  console.log(`Boo! Workbox didn't load 😢`);
+}
