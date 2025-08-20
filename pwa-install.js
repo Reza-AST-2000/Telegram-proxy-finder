@@ -7,7 +7,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     // For example, by removing a 'hidden' class from a button element
     const installButton = document.getElementById('install-pwa-button');
     if (installButton) {
-        installButton.style.display = 'block';
+       installButton.classList.remove('hidden');
     }
 });
 
