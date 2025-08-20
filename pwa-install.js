@@ -3,11 +3,10 @@ let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    // Show your custom install button here
-    // For example, by removing a 'hidden' class from a button element
     const installButton = document.getElementById('install-pwa-button');
     if (installButton) {
-       installButton.classList.remove('hidden');
+        // کلاس hidden را حذف کنید تا دکمه نمایش داده شود.
+        installButton.classList.remove('hidden');
     }
 });
 
