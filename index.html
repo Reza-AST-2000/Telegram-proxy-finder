@@ -401,7 +401,9 @@
             <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
                 نسل جدید دسترسی به پروکسی‌های امن و پرسرعت MTProto
             </p>
-            <p id="lastUpdate" class="mt-4 text-sm text-slate-500"></p>
+            <div class="inline-block mt-4 px-4 py-2 bg-gray-900/50 rounded-lg border border-gray-800">
+                <p id="lastUpdate" class="font-bold text-sm text-slate-400"></p>
+            </div>
         </header>
 
         <section id="control-panel" class="proxy-card p-6 mb-8 fade-in-up" style="animation-delay: 0.2s;">
@@ -616,7 +618,7 @@
             searchInput: document.getElementById('searchInput'),
             sortSelect: document.getElementById('sortSelect'),
             perPageSelect: document.getElementById('perPageSelect'),
-            lastUpdate: document.getElementById('lastUpdate') // المان جدید برای نمایش تاریخ
+            lastUpdate: document.getElementById('lastUpdate')
         };
 
         const countryTranslations = {
@@ -952,7 +954,7 @@
         
         elements.searchInput.addEventListener('input', (e) => {
             currentSearch = e.target.value;
-            debouncedSearch(); // استفاده از نسخه debounce شده
+            debouncedSearch();
         });
         
         elements.sortSelect.addEventListener('change', (e) => {
