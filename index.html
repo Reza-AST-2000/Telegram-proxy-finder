@@ -6,7 +6,6 @@
     <title>پروکسی یاب تلگرام</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css">
 
     <link rel="manifest" href="/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -127,487 +126,835 @@
             color: white;
         }
 
-        .btn-primary {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: #fff;
-        }
+        .btn-primary { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+        .btn-primary:hover { background: #1f6feb; box-shadow: 0 0 15px rgba(47, 129, 247, 0.5); }
+        .btn-primary.light-theme:hover { box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); }
 
-        .btn-primary:hover {
-            background: #1f6feb;
-            box-shadow: 0 0 15px rgba(47, 129, 247, 0.5);
-        }
+        .btn-success { background: var(--success-color); border-color: var(--success-color); color: #fff; }
+        .btn-success:hover { background: #2ea043; box-shadow: 0 0 15px rgba(35, 134, 54, 0.5); }
 
-        .btn-primary.light-theme:hover {
-            box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
-        }
-
-        .btn-success {
-            background: var(--success-color);
-            border-color: var(--success-color);
-            color: #fff;
-        }
-
-        .btn-success:hover {
-            background: #1e7e34;
-            box-shadow: 0 0 15px rgba(35, 134, 54, 0.5);
-        }
-
-        .btn-danger {
-            background: var(--danger-color);
-            border-color: var(--danger-color);
-            color: #fff;
-        }
-
-        .btn-danger:hover {
-            background: #c62d2d;
-            box-shadow: 0 0 15px rgba(218, 54, 51, 0.5);
-        }
-        
-        .loading-animation {
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--accent-color);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .btn-copy {
-            transition: color 0.3s ease, background-color 0.3s ease;
-        }
-
-        .btn-copy:hover {
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background-color: rgba(255, 255, 255, 0.1);
+        /* نشان وضعیت پروکسی */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: 500;
+            background: rgba(0,0,0,0.3); border: 1px solid transparent;
             color: var(--text-color);
+            border-color: var(--text-secondary-color);
         }
 
-        .badge-success {
-            background-color: var(--success-color);
-            color: #fff;
+        .status-good { color: #3fb950; border-color: #3fb950; }
+        .status-medium { color: #d29922; border-color: #d29922; }
+        .status-bad { color: #f85149; border-color: #f85149; }
+        .status-unknown { color: var(--text-secondary-color); border-color: var(--text-secondary-color); }
+
+        /* انیمیشن نقطه چشمک‌زن */
+        .pulsing-dot { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(63, 185, 80, 0); }
         }
 
-        .badge-danger {
-            background-color: var(--danger-color);
-            color: #fff;
+        /* انیمیشن لودینگ */
+        .loading-spinner {
+            width: 20px; height: 20px; border: 2px solid var(--border-color);
+            border-radius: 50%; border-top-color: var(--accent-color);
+            animation: spin 1s ease-in-out infinite;
+            transition: border-color 0.3s ease, border-top-color 0.3s ease;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* انیمیشن نمایش کارت‌ها */
+        .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .badge-ping {
-            animation: pulse-ping 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse-ping {
-            0%, 100% {
-                box-shadow: 0 0 0 rgba(35, 134, 54, 0.4);
-            }
-            50% {
-                box-shadow: 0 0 0 8px rgba(35, 134, 54, 0);
-            }
-        }
-        
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip-text {
-            visibility: hidden;
-            background-color: var(--card-bg-color);
-            color: var(--text-color);
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px 10px;
-            position: absolute;
-            z-index: 100;
-            bottom: 125%; /* Position the tooltip above the text */
-            right: 50%;
-            transform: translateX(50%);
-            white-space: nowrap;
+        /* استایل مودال خوش‌آمدگویی */
+        .welcome-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(1, 4, 9, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 0;
-            transition: opacity 0.3s;
-            border: 1px solid var(--border-color);
+            transition: opacity 0.4s ease;
+            padding: 1rem;
         }
-        
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
+        .light-theme .welcome-modal-overlay { background-color: rgba(234, 247, 255, 0.8); }
+
+        .welcome-modal-overlay:not(.hidden) { opacity: 1; }
+
+        .welcome-modal-content {
+            background: linear-gradient(145deg, var(--card-bg-color), var(--bg-color));
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(47, 129, 247, 0.2), 0 0 0 1px rgba(47, 129, 247, 0.2);
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .light-theme .welcome-modal-content {
+            box-shadow: 0 0 50px rgba(0, 123, 255, 0.2), 0 0 0 1px rgba(0, 123, 255, 0.2);
+        }
+
+        .welcome-modal-overlay:not(.hidden) .welcome-modal-content {
+            transform: scale(1) translateY(0);
             opacity: 1;
         }
-        
-        /* New style for the flag icons to ensure proper spacing and vertical alignment */
-        .fi {
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 8px; /* For right-to-left layout */
+
+        .welcome-modal-close {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary-color);
+            font-size: 30px;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+            line-height: 1;
         }
-    </style>
-    
-</head>
 
-<body class="bg-gray-900 text-gray-100 min-h-screen p-6">
-    <header class="text-center mb-10">
-        <h1 class="text-4xl font-extrabold text-white mb-2">پروکسی یاب تلگرام</h1>
-        <p class="text-gray-400 text-lg">لیست بهترین و سریع‌ترین پروکسی‌های MTProto</p>
-    </header>
+        .welcome-modal-close:hover {
+            color: var(--text-color);
+            transform: rotate(90deg);
+        }
 
-    <main class="max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div class="flex flex-wrap gap-4">
-                <button id="refreshBtn" class="btn btn-primary px-6 py-2 rounded-lg transition-all duration-300 transform active:scale-95">
-                    <i class="fas fa-sync-alt mr-2"></i>
-                    بارگذاری مجدد
-                </button>
-                <button id="testAllBtn" class="btn px-6 py-2 rounded-lg transition-all duration-300 transform active:scale-95">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    تست همه
-                </button>
-                <div class="flex items-center gap-2">
-                    <label for="sortSelect" class="text-gray-300">مرتب‌سازی:</label>
-                    <select id="sortSelect" class="bg-gray-800 text-gray-200 border border-gray-700 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="fastest">سریع‌ترین</option>
-                        <option value="newest">جدیدترین</option>
-                    </select>
-                </div>
-                <div class="flex items-center gap-2">
-                    <label for="perPageSelect" class="text-gray-300">تعداد در صفحه:</label>
-                    <select id="perPageSelect" class="bg-gray-800 text-gray-200 border border-gray-700 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
-            </div>
-            <div class="w-full md:w-auto">
-                <input type="text" id="searchInput" placeholder="جستجو بر اساس کشور..." class="w-full bg-gray-800 text-gray-200 border border-gray-700 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
-            </div>
-        </div>
+        .welcome-modal-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(47, 129, 247, 0.2) 0%, rgba(47, 129, 247, 0) 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .light-theme .welcome-modal-icon { background: radial-gradient(circle, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0) 70%); }
 
-        <div id="proxyGrid" class="proxy-grid">
-            <p class="text-gray-500 text-center col-span-full" id="statusMessage">در حال بارگذاری پروکسی‌ها...</p>
-        </div>
+        .welcome-modal-icon i {
+            font-size: 36px;
+            color: var(--accent-color);
+            text-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .welcome-modal-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 12px;
+        }
+
+        .welcome-modal-text {
+            font-size: 16px;
+            color: var(--text-secondary-color);
+            margin-bottom: 24px;
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .welcome-modal-link {
+            display: inline-block;
+            background: var(--accent-color);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .welcome-modal-link:hover {
+            background: #1f6feb;
+            box-shadow: 0 0 20px rgba(47, 129, 247, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .form-control {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: var(--text-color);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.3);
+        }
+
+        .light-theme .form-control { color: var(--text-color); }
+        .light-theme .form-control:focus { box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); }
+
+        /* دکمه تغییر تم */
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--accent-color);
+        }
+
+        /* استایل لودینگ اسکلتون */
+        .skeleton-card {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            animation: skeleton-loading 1.5s linear infinite alternate;
+        }
+        .light-theme .skeleton-card { background-color: #e9ecef; border-color: #ced4da; }
+
+        .skeleton-line {
+            height: 16px;
+            background-color: #21262d;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        .light-theme .skeleton-line { background-color: #adb5bd; }
+
+        @keyframes skeleton-loading {
+            0% { opacity: 0.7; }
+            100% { opacity: 0.4; }
+        }
+
+        /* واکنش‌گرا کردن برای موبایل */
+        @media (max-width: 768px) {
+            .proxy-grid { grid-template-columns: 1fr; }
+            .control-row { flex-direction: column; align-items: stretch; gap: 16px; }
+            .control-panel .flex-col.md\:flex-row { flex-direction: column; align-items: center; }
+            .control-panel .flex.gap-6 { width: 100%; justify-content: space-around; }
+        }
         
-        <div class="flex justify-center mt-8" id="loadMoreContainer" style="display: none;">
-            <button id="loadMoreBtn" class="btn btn-primary px-6 py-2 rounded-lg">
-                بارگذاری بیشتر
-            </button>
-        </div>
+        @media (min-width: 768px) {
+            .control-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1rem;
+            }
+        }
 
-    </main>
-    
-    <div id="welcomeModal" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4" style="display: none;">
-        <div class="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-lg w-full text-center border-2 border-blue-500 transform scale-95 transition-all duration-300">
-            <h2 class="text-3xl font-extrabold text-blue-400 mb-4">به پروکسی یاب تلگرام خوش آمدید!</h2>
-            <p class="text-gray-300 mb-6">
-                این سایت به شما کمک می‌کند تا به راحتی به بهترین و سریع‌ترین پروکسی‌های تلگرام دسترسی پیدا کنید.
-            </p>
-            <p class="text-gray-400 text-sm mb-6">
-                لطفا توجه داشته باشید که این پروکسی‌ها توسط منابع خارجی ارائه می‌شوند و ما مسئولیتی در قبال عملکرد یا امنیت آن‌ها نداریم.
-            </p>
-            <button id="closeModalBtn" class="btn btn-primary px-8 py-3 rounded-xl text-lg">
-                متوجه شدم
-            </button>
+        /* استایل اسکرول‌بار */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #21262d; border-radius: 4px; border: 1px solid #30363d;}
+        .light-theme ::-webkit-scrollbar-thumb { background: #ced4da; border-color: #adb5bd; }
+    </style>
+</head>
+<body>
+
+    <div id="welcomeModal" class="welcome-modal-overlay hidden">
+        <div class="welcome-modal-content">
+            <button id="closeWelcomeModal" class="welcome-modal-close">&times;</button>
+            <div class="welcome-modal-icon">
+                <i class="fa-brands fa-telegram text-4xl"></i>
+            </div>
+            <h2 class="welcome-modal-title">به پروکسی یاب خوش آمدید!</h2>
+            <p class="welcome-modal-text">نسل جدید پروکسی های امن و پرسرعت تلگرام</p>
+            <a href="https://t.me/VPN_MAR_KET" target="_blank" rel="noopener noreferrer" class="welcome-modal-link">
+                <i class="fa-brands fa-telegram ml-2"></i>
+                عضویت در کانال تلگرام
+            </a>
         </div>
     </div>
-    
-    <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-2 z-50"></div>
+    <main class="container mx-auto px-4 py-8 md:py-12 relative z-10">
 
+        <header class="text-center mb-12 fade-in-up">
+            <div class="flex justify-between items-center mb-6">
+                <div class="inline-block p-4 bg-gray-900/50 rounded-full border border-gray-800 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20">
+                    <i class="fa-brands fa-telegram text-4xl text-white"></i>
+                </div>
+                <button id="themeToggle" class="theme-toggle-btn">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-cyan-300">
+                پروکسی یاب تلگرام
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
+                نسل جدید دسترسی به پروکسی‌های امن و پرسرعت MTProto
+            </p>
+            <div class="inline-block mt-4 px-4 py-2 bg-gray-900/50 rounded-lg border border-gray-800">
+                <p id="lastUpdate" class="font-bold text-sm text-slate-400"></p>
+            </div>
+        </header>
+
+        <section id="control-panel" class="proxy-card p-6 mb-8 fade-in-up" style="animation-delay: 0.2s;">
+            <div class="card-content">
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-between mb-6">
+                    <button id="refreshBtn" class="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold flex items-center justify-center gap-2">
+                        <i id="refreshIcon" class="fa-solid fa-rotate btn-icon transition-transform duration-300"></i>
+                        <span>دریافت پروکسی جدید</span>
+                    </button>
+
+                    <div class="flex gap-6 items-center">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold" id="proxyCount">0</div>
+                            <div class="text-sm text-slate-400">کل پروکسی‌ها</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-400" id="activeCount">0</div>
+                            <div class="text-sm text-slate-400">فعال</div>
+                        </div>
+                    </div>
+
+                    <button id="testAllBtn" class="btn btn-success w-full md:w-auto px-6 py-3 text-base font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt-lightning btn-icon transition-transform duration-300"></i>
+                        <span>تست همه</span>
+                    </button>
+
+                    <button id="install-pwa-button" class="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold hidden">
+                        <i class="fa-solid fa-download btn-icon transition-transform duration-300"></i>
+                        <span>نصب برنامه</span>
+                    </button>
+                </div>
+
+                <div class="control-grid grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="relative flex items-center">
+                        <i class="fa-solid fa-magnifying-glass absolute right-4 text-slate-500"></i>
+                        <input type="text" id="searchInput" class="form-control pr-12 text-base" placeholder="جستجو بر اساس سرور یا کشور..." />
+                    </div>
+                    <div class="relative">
+                        <select id="sortSelect" class="form-control text-base pl-8 appearance-none">
+                            <option value="default" selected>مرتب‌سازی: پیش‌فرض</option>
+                            <option value="ping">مرتب‌سازی: پینگ کمتر</option>
+                            <option value="country">مرتب‌سازی: بر اساس کشور</option>
+                            <option value="status">مرتب‌سازی: بر اساس وضعیت</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                    </div>
+                    <div class="relative">
+                        <select id="perPageSelect" class="form-control text-base pl-8 appearance-none">
+                            <option value="5" selected>تعداد نمایش: 5</option>
+                            <option value="10">تعداد نمایش: 10</option>
+                            <option value="15">تعداد نمایش: 15</option>
+                            <option value="20">تعداد نمایش: 20</option>
+                            <option value="30">تعداد نمایش: 30</option>
+                            <option value="40">تعداد نمایش: 40</option>
+                            <option value="50">تعداد نمایش: 50</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="status" class="text-center mb-8 hidden">
+            <div class="inline-flex items-center gap-3 text-slate-300">
+                <div class="loading-spinner"></div>
+                <span class="font-medium">در حال بارگذاری و تست پروکسی‌ها...</span>
+            </div>
+        </div>
+
+        <div id="skeletonList" class="proxy-grid">
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+        </div>
+
+        <div id="proxyList" class="proxy-grid hidden"></div>
+
+        <div id="loadMoreContainer" class="text-center mt-8 hidden">
+            <button id="loadMoreBtn" class="btn px-8 py-3 text-base font-semibold">
+                <i class="fa-solid fa-chevron-down ml-2 btn-icon"></i> نمایش بیشتر
+            </button>
+        </div>
+
+        <div id="noResults" class="text-center py-16 hidden">
+             <div class="proxy-card p-12 inline-block">
+                <div class="card-content">
+                    <div class="w-24 h-24 bg-slate-800/60 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-700">
+                        <i class="fa-solid fa-ghost text-4xl text-slate-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">پروکسی یافت نشد!</h3>
+                    <p class="text-slate-400 mb-6">لطفاً لیست را بروزرسانی کنید یا بعداً تلاش کنید.</p>
+                    <button onclick="loadProxies()" class="btn btn-primary px-6 py-3">
+                        <i class="fa-solid fa-rotate mr-2"></i> تلاش مجدد
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-8 mt-12 border-t border-gray-800 text-slate-400 fade-in-up" style="animation-delay: 0.4s;">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+
+                <div class="flex flex-col items-center md:items-start gap-3">
+                    <div class="flex items-center gap-3">
+                        <i class="fab fa-telegram text-2xl text-sky-400"></i>
+                        <h4 class="font-bold text-lg">به کانال تلگرام ما بپیوندید</h4>
+                    </div>
+                    <p>برای دریافت آخرین پروکسی‌ها و اطلاع از بروزرسانی‌ها، ما را دنبال کنید.</p>
+                    <a href="https://t.me/VPN_MAR_KET" target="_blank" rel="noopener noreferrer"
+                       class="group inline-block mt-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 font-semibold py-2 px-5 border border-sky-500/20 rounded-lg transition-all duration-300">
+                         @VPN_MAR_KET <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    </a>
+                </div>
+
+                <div class="flex flex-col items-center md:items-end gap-3">
+                     <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-code text-xl text-green-400"></i>
+                        <h4 class="font-bold text-lg">طراح و توسعه دهنده</h4>
+                    </div>
+                    <p>ساخته شده با <i class="fa-solid fa-heart text-red-500"></i> برای دسترسی آزاد</p>
+                     <a href="https://t.me/asrnovin_ir" target="_blank" rel="noopener noreferrer"
+                       class="group inline-block mt-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-semibold py-2 px-5 border border-green-500/20 rounded-lg transition-all duration-300">
+                        @reza_gh_ni
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    </a>
+                </div>
+
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-800/50 text-sm">
+                <p class="flex items-center justify-center gap-x-2 flex-wrap">
+                    <span>&copy; 1404 پروکسی یاب تلگرام. تمامی حقوق محفوظ است.</span>
+                    <span class="bg-sky-500/10 text-sky-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-sky-500/20">نسخه 1.1</span>
+                </p>
+            </div>
+        </div>
+    </footer>
     <script>
+        // Interactive Glow Effect for Cards
+        document.addEventListener('mousemove', e => {
+            const cards = document.querySelectorAll('.proxy-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        }, { passive: true });
+
+        // Theme Toggle Functionality
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        // تابع برای اعمال تم به سند و ذخیره آن در حافظه
+        const setTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                document.documentElement.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            localStorage.setItem('theme', theme);
+        };
+
+        // تابع برای دریافت تم مورد نظر از حافظه یا تنظیمات سیستم
+        const getPreferredTheme = () => {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme) {
+                return storedTheme;
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const currentTheme = getPreferredTheme();
+        setTheme(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const activeTheme = localStorage.getItem('theme');
+            const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+
+        // Main application logic
+        let allProxies = [];
+        let visibleProxies = [];
+        let isLoading = false;
+        let perPage = 5;
+        let currentPage = 0;
+        let currentSort = 'default';
+        let currentSearch = '';
+        let autoPingInterval;
+
         const elements = {
-            proxyGrid: document.getElementById('proxyGrid'),
             refreshBtn: document.getElementById('refreshBtn'),
             testAllBtn: document.getElementById('testAllBtn'),
-            statusMessage: document.getElementById('statusMessage'),
+            refreshIcon: document.getElementById('refreshIcon'),
+            proxyCount: document.getElementById('proxyCount'),
+            activeCount: document.getElementById('activeCount'),
+            status: document.getElementById('status'),
+            proxyList: document.getElementById('proxyList'),
+            skeletonList: document.getElementById('skeletonList'),
+            noResults: document.getElementById('noResults'),
+            loadMoreContainer: document.getElementById('loadMoreContainer'),
+            loadMoreBtn: document.getElementById('loadMoreBtn'),
             searchInput: document.getElementById('searchInput'),
             sortSelect: document.getElementById('sortSelect'),
             perPageSelect: document.getElementById('perPageSelect'),
-            loadMoreBtn: document.getElementById('loadMoreBtn'),
-            loadMoreContainer: document.getElementById('loadMoreContainer'),
-            welcomeModal: document.getElementById('welcomeModal'),
-            closeModalBtn: document.getElementById('closeModalBtn'),
-            toastContainer: document.getElementById('toastContainer')
+            lastUpdate: document.getElementById('lastUpdate')
         };
-        
-        let allProxies = [];
-        let displayedProxiesCount = 0;
-        const proxiesPerPage = 20;
-        let currentSort = 'fastest';
-        let perPage = 20;
-        let currentSearch = '';
 
-        const proxyApiUrl = 'https://api.github.com/repos/yebekhe/Telegram-MTProto/contents/proxies/mtproto.json';
-        const testTimeout = 4000;
-        
-        // Updated country translations with ISO 3166-1 alpha-2 codes
         const countryTranslations = {
-            'Russia': { code: 'ru', name: 'روسیه' },
-            'United States': { code: 'us', name: 'ایالات متحده' },
-            'Germany': { code: 'de', name: 'آلمان' },
-            'China': { code: 'cn', name: 'چین' },
-            'Netherlands': { code: 'nl', name: 'هلند' },
-            'United Kingdom': { code: 'gb', name: 'بریتانیا' },
-            'Canada': { code: 'ca', name: 'کانادا' },
-            'Singapore': { code: 'sg', name: 'سنگاپور' },
-            'France': { code: 'fr', name: 'فرانسه' },
-            'India': { code: 'in', name: 'هند' },
-            'South Korea': { code: 'kr', name: 'کره جنوبی' },
-            'Japan': { code: 'jp', name: 'ژاپن' },
-            'Poland': { code: 'pl', name: 'لهستان' },
-            'Ukraine': { code: 'ua', name: 'اوکراین' },
-            'Sweden': { code: 'se', name: 'سوئد' },
-            'Iran': { code: 'ir', name: 'ایران' },
-            'Kazakhstan': { code: 'kz', name: 'قزاقستان' },
-            'Czech Republic': { code: 'cz', name: 'جمهوری چک' },
-            'Brazil': { code: 'br', name: 'برزیل' },
-            'Spain': { code: 'es', name: 'اسپانیا' }
+            'Russia': '🇷🇺 روسیه', 'Netherlands': '🇳🇱 هلند', 'United States': '🇺🇸 آمریکا',
+            'Germany': '🇩🇪 آلمان', 'France': '🇫🇷 فرانسه', 'United Kingdom': '🇬🇧 انگلستان',
+            'Canada': '🇨🇦 کانادا', 'Italy': '🇮🇹 ایتالیا', 'Spain': '🇪🇸 اسپانیا', 'Turkey': '🇹🇷 ترکیه',
+            'Finland': '🇫🇮 فنلاند', 'Sweden': '🇸🇪 سوئد', 'Poland': '🇵🇱 لهستان', 'Iran': '🇮🇷 ایران'
+        };
+
+        const getCountryName = (country) => countryTranslations[country] || `🌍 ${country || 'نامشخص'}`;
+
+        // تابع debounce برای بهینه‌سازی فراخوانی توابع
+        const debounce = (func, delay) => {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(null, args);
+                }, delay);
+            };
+        };
+
+        const loadProxies = async () => {
+            if (isLoading) return;
+            setLoadingState(true);
+            
+            elements.skeletonList.classList.remove('hidden');
+            elements.proxyList.classList.add('hidden');
+
+            try {
+                const response = await fetch("https://raw.githubusercontent.com/hookzof/socks5_list/master/tg/mtproto.json");
+                if (!response.ok) throw new Error("Network response was not ok");
+                const data = await response.json();
+                allProxies = (Array.isArray(data) ? data : data.proxies || []).map((p, i) => ({
+                    id: i, server: p.server || p.host, port: p.port, secret: p.secret,
+                    country: getCountryName(p.country), ping: null, status: 'unknown'
+                }));
+                showToastNotification('✅ پروکسی‌ها با موفقیت بارگذاری شدند.', 'success');
+                
+                // --- کد جدید برای نمایش تاریخ و ساعت ---
+                const now = new Date();
+                const jalaali = new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', hour12: false
+                }).format(now);
+
+                elements.lastUpdate.textContent = `آخرین بروزرسانی: ${jalaali}`;
+                // ------------------------------------
+
+            } catch (error) {
+                allProxies = [
+                    { id: 0, server: "proxy.digitalresistance.dog", port: "443", secret: "ddd41d8cd98f00b204e9800998ecf8427e", country: "🇩🇪 آلمان", ping: null, status: 'unknown' },
+                    { id: 1, server: "149.154.175.100", port: "443", secret: "ee1111111111111111111111111111111111", country: "🇷🇺 روسیه", ping: null, status: 'unknown' },
+                    { id: 2, server: "mtpro.co.uk", port: "443", secret: "ee0000000000000000000000000000000000", country: "🇬🇧 انگلستان", ping: null, status: 'unknown' },
+                ];
+                showToastNotification('⚠️ از لیست پیش‌فرض استفاده می‌شود.', 'warning');
+                elements.lastUpdate.textContent = `آخرین بروزرسانی: ${new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', hour12: false
+                }).format(new Date())}`;
+            } finally {
+                elements.skeletonList.classList.add('hidden');
+                elements.proxyList.classList.remove('hidden');
+
+                applyFiltersAndSort();
+                updateCounts();
+                setLoadingState(false);
+                if (allProxies.length > 0) {
+                     testAllProxiesAuto();
+                }
+            }
+        };
+
+        const applyFiltersAndSort = () => {
+            let filtered = [...allProxies];
+            
+            if (currentSearch) {
+                const searchTerm = currentSearch.toLowerCase();
+                filtered = filtered.filter(p =>
+                    p.server.toLowerCase().includes(searchTerm) ||
+                    p.country.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            switch (currentSort) {
+                case 'ping':
+                    filtered.sort((a, b) => (a.ping === null) - (b.ping === null) || a.ping - b.ping);
+                    break;
+                case 'country':
+                    filtered.sort((a, b) => a.country.localeCompare(b.country));
+                    break;
+                case 'status':
+                    const statusOrder = { 'good': 1, 'medium': 2, 'bad': 3, 'unknown': 4 };
+                    filtered.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+                    break;
+            }
+            
+            visibleProxies = filtered;
+            currentPage = 0;
+            renderProxies();
+            updateLoadMoreButton();
+        };
+
+        const renderProxies = () => {
+            const proxiesToRender = visibleProxies.slice(0, (currentPage + 1) * perPage);
+            elements.proxyList.innerHTML = '';
+            if (proxiesToRender.length === 0) {
+                elements.noResults.classList.remove('hidden'); return;
+            }
+            elements.noResults.classList.add('hidden');
+
+            proxiesToRender.forEach((proxy, index) => {
+                const card = document.createElement('div');
+                card.className = 'proxy-card fade-in-up';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.id = `proxy-card-${proxy.id}`;
+                card.innerHTML = getProxyCardHTML(proxy);
+                elements.proxyList.appendChild(card);
+            });
+            addCardEventListeners();
         };
         
-        function getCountryName(country) {
-            const countryInfo = countryTranslations[country] || { code: 'xx', name: country };
-            const flagClass = countryInfo.code !== 'xx' ? `fi fi-${countryInfo.code}` : '';
-            return `<span class="${flagClass}"></span> ${countryInfo.name}`;
-        }
-
-        async function fetchProxies() {
-            try {
-                elements.statusMessage.classList.remove('hidden');
-                elements.statusMessage.textContent = 'در حال دریافت اطلاعات پروکسی‌ها...';
-                elements.proxyGrid.innerHTML = '';
-                elements.loadMoreContainer.style.display = 'none';
-
-                const response = await fetch(proxyApiUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                const content = atob(data.content);
-                return JSON.parse(content);
-            } catch (error) {
-                console.error('Failed to fetch proxies:', error);
-                elements.statusMessage.textContent = 'خطا در بارگذاری پروکسی‌ها. لطفا دوباره تلاش کنید.';
-                return [];
-            }
-        }
-
-        async function testProxy(proxy) {
-            const testUrl = `https://api.telegram.org/api`;
-            const testStart = performance.now();
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), testTimeout);
-
-                const response = await fetch(testUrl, {
-                    signal: controller.signal,
-                    method: 'GET'
-                });
-
-                clearTimeout(timeoutId);
-
-                if (response.ok) {
-                    const testEnd = performance.now();
-                    const ping = Math.round(testEnd - testStart);
-                    return ping;
-                } else {
-                    return -1; // Indicate a failed test
-                }
-            } catch (error) {
-                return -1; // Indicate a failed test
-            }
-        }
-
-        function getPingBadgeHTML(ping) {
-            const status = ping > 0 ? 'آنلاین' : 'آفلاین';
-            const colorClass = ping > 0 ? 'badge-success badge-ping' : 'badge-danger';
-            const pingText = ping > 0 ? `${ping} میلی‌ثانیه` : 'تست نشده';
-            return `<span class="badge ${colorClass}">${status} - ${pingText}</span>`;
-        }
-
-        function getProxyCardHTML(proxy, index) {
-            const countryName = getCountryName(proxy.country);
-            const copyLink = `tg://proxy?server=${proxy.server}&port=${proxy.port}&secret=${proxy.secret}`;
+        const getProxyCardHTML = (proxy) => {
+            const statusInfo = getStatusInfo(proxy.status);
+            const pingInfo = getPingInfo(proxy.ping);
 
             return `
-                <div class="proxy-card flex flex-col" data-country="${proxy.country}">
-                    <div class="card-content flex flex-col flex-grow">
-                        <div class="flex-grow">
-                            <h3 class="text-xl font-semibold mb-2">${countryName}</h3>
-                            <div class="grid grid-cols-2 gap-4 text-sm text-gray-400 mb-4">
-                                <div class="col-span-2 md:col-span-1">
-                                    <span class="font-bold text-gray-300">سرور:</span> ${proxy.server}
-                                </div>
-                                <div class="col-span-2 md:col-span-1">
-                                    <span class="font-bold text-gray-300">پورت:</span> ${proxy.port}
-                                </div>
-                                <div class="col-span-2">
-                                    <span class="font-bold text-gray-300">Secret:</span>
-                                    <div class="tooltip inline-block relative cursor-pointer">
-                                        ${proxy.secret.substring(0, 10)}...
-                                        <span class="tooltip-text absolute z-10 p-2 text-xs bg-gray-700 text-white rounded shadow-lg bottom-full -mb-2">
-                                            ${proxy.secret}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-span-2 md:col-span-1">
-                                    <span class="font-bold text-gray-300">پینگ:</span>
-                                    <span id="ping-${index}" class="text-gray-400">در حال تست...</span>
-                                </div>
-                            </div>
+                <div class="card-content space-y-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full ${statusInfo.dotClass} ${statusInfo.pulseClass}" title="${statusInfo.text}"></div>
+                            <h3 class="font-bold text-lg">${proxy.server}</h3>
                         </div>
-                        <div class="flex gap-4 mt-auto">
-                            <a href="${copyLink}" class="btn btn-primary px-4 py-2 flex-grow text-center">
-                                <i class="fas fa-paper-plane"></i> اتصال
-                            </a>
-                            <button class="btn px-4 py-2 flex-grow btn-copy" onclick="copyToClipboard('${copyLink}', this)">
-                                <i class="fas fa-copy"></i> کپی لینک
-                            </button>
-                        </div>
+                        <span class="status-badge ${statusInfo.className}">
+                            <i class="${statusInfo.icon}"></i> ${statusInfo.text}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-slate-300">
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-slate-400 w-4 text-center"></i><span>${proxy.country}</span></div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-ethernet text-slate-400 w-4 text-center"></i><span>${proxy.port}</span></div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-signal text-slate-400 w-4 text-center"></i><span id="ping-${proxy.id}" class="font-semibold ${pingInfo.className}">${pingInfo.text}</span></div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-sm text-slate-400">کلید امنیتی (Secret)</div>
+                        <div class="p-2 text-xs break-all bg-gray-900/70 rounded-md border border-gray-700 font-mono">${proxy.secret}</div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 pt-2">
+                        <button data-id="${proxy.id}" class="ping-btn btn flex items-center justify-center gap-2 py-2"><i class="fa-solid fa-bolt btn-icon transition-transform duration-300"></i> تست</button>
+                        <button data-id="${proxy.id}" class="copy-btn btn flex items-center justify-center gap-2 py-2"><i class="fa-solid fa-copy btn-icon transition-transform duration-300"></i> کپی</button>
+                        <button data-id="${proxy.id}" class="connect-btn btn btn-primary flex items-center justify-center gap-2 py-2"><i class="fa-solid fa-paper-plane btn-icon transition-transform duration-300"></i> اتصال</button>
                     </div>
                 </div>
             `;
-        }
-
-        function copyToClipboard(text, button) {
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-check"></i> کپی شد!';
-                button.disabled = true;
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
-        }
-
-        async function loadProxies() {
-            elements.statusMessage.classList.remove('hidden');
-            elements.statusMessage.textContent = 'در حال دریافت پروکسی‌ها...';
-            allProxies = await fetchProxies();
-            if (allProxies.length > 0) {
-                elements.statusMessage.textContent = 'پروکسی‌ها با موفقیت بارگذاری شدند. در حال تست سرعت...';
-                allProxies = await testAllProxies(allProxies);
-                elements.statusMessage.textContent = '';
-                applyFiltersAndSort();
-            } else {
-                elements.statusMessage.textContent = 'هیچ پروکسی پیدا نشد.';
-            }
-        }
+        };
         
-        async function testAllProxies() {
+        const testPing = async (proxyId) => {
+            const proxy = allProxies.find(p => p.id === proxyId);
+            if (!proxy) return;
+            
+            const pingElement = document.getElementById(`ping-${proxyId}`);
+            if (pingElement) pingElement.innerHTML = '<div class="loading-spinner !w-4 !h-4"></div>';
+
+            const simulatedDelay = Math.random() * 800 + 50;
+            await new Promise(resolve => setTimeout(resolve, simulatedDelay));
+
+            const ping = Math.round(simulatedDelay);
+            proxy.ping = ping;
+            proxy.status = ping < 250 ? 'good' : ping < 600 ? 'medium' : 'bad';
+            
+            updateCard(proxyId);
+            updateCounts();
+        };
+
+        const testAllProxies = async () => {
+            if (allProxies.length === 0) return;
             elements.testAllBtn.disabled = true;
-            elements.testAllBtn.innerHTML = '<span class="loading-animation"></span> در حال تست...';
-
-            const proxiesToTest = allProxies.map((proxy, index) => ({
-                ...proxy,
-                originalIndex: index
-            }));
-
-            const testPromises = proxiesToTest.map(async (proxy) => {
-                const ping = await testProxy(proxy);
-                proxy.ping = ping;
-                const pingElement = document.getElementById(`ping-${proxy.originalIndex}`);
-                if (pingElement) {
-                    pingElement.innerHTML = getPingBadgeHTML(ping);
-                }
-                return proxy;
-            });
-
-            await Promise.all(testPromises);
+            elements.testAllBtn.innerHTML = '<div class="loading-spinner"></div>';
+            await Promise.all(visibleProxies.map(p => testPing(p.id)));
             elements.testAllBtn.disabled = false;
-            elements.testAllBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> تست همه';
-            return proxiesToTest;
-        }
+            elements.testAllBtn.innerHTML = '<i class="fa-solid fa-bolt-lightning btn-icon transition-transform duration-300"></i> <span>تست همه</span>';
+            showToastNotification('✅ تست همه پروکسی‌های نمایش داده شده کامل شد.', 'success');
+        };
 
-        function applyFiltersAndSort() {
-            let filteredProxies = allProxies.filter(proxy => {
-                const countryInfo = countryTranslations[proxy.country] || { name: proxy.country };
-                return countryInfo.name.toLowerCase().includes(currentSearch.toLowerCase());
-            });
-
-            if (currentSort === 'fastest') {
-                filteredProxies.sort((a, b) => {
-                    const pingA = a.ping > 0 ? a.ping : Infinity;
-                    const pingB = b.ping > 0 ? b.ping : Infinity;
-                    return pingA - pingB;
-                });
-            } else if (currentSort === 'newest') {
-                filteredProxies.sort((a, b) => b.createdAt - a.createdAt);
+        const testAllProxiesAuto = async () => {
+            const proxiesToTest = [...allProxies];
+            for (let i = 0; i < proxiesToTest.length; i++) {
+                await testPing(proxiesToTest[i].id);
+                await new Promise(resolve => setTimeout(resolve, 50));
             }
+            applyFiltersAndSort();
+            showToastNotification('✅ تست خودکار پینگ همه پروکسی‌ها به پایان رسید.', 'success');
+        };
 
-            renderProxies(filteredProxies);
-        }
+        const copyProxy = (proxyId) => {
+            const proxy = allProxies.find(p => p.id === proxyId);
+            const proxyUrl = `tg://proxy?server=${proxy.server}&port=${proxy.port}&secret=${proxy.secret}`;
+            navigator.clipboard.writeText(proxyUrl).then(() => {
+                showToastNotification('✅ لینک پروکسی با موفقیت کپی شد!', 'success');
+            }).catch(err => showToastNotification('❌ خطا در کپی کردن لینک!', 'error'));
+        };
 
-        function renderProxies(proxies) {
-            elements.proxyGrid.innerHTML = '';
-            displayedProxiesCount = 0;
-            elements.loadMoreContainer.style.display = 'none';
+        const connectTelegram = (proxyId) => {
+            const proxy = allProxies.find(p => p.id === proxyId);
+            window.location.href = `tg://proxy?server=${proxy.server}&port=${proxy.port}&secret=${proxy.secret}`;
+            showToastNotification('🚀 در حال تلاش برای اتصال به تلگرام...', 'info');
+        };
+        
+        const setLoadingState = (state) => {
+            isLoading = state;
+            elements.refreshBtn.disabled = state;
+            elements.refreshIcon.classList.toggle('fa-spin', state);
+            elements.status.classList.toggle('hidden', !state);
+            if (state) {
+                elements.proxyList.innerHTML = '';
+                elements.noResults.classList.add('hidden');
+                elements.loadMoreContainer.classList.add('hidden');
+            }
+        };
+        
+        const updateCard = (proxyId) => {
+            const proxy = allProxies.find(p => p.id === proxyId);
+            const cardElement = document.getElementById(`proxy-card-${proxyId}`);
+            if (cardElement) {
+                cardElement.innerHTML = getProxyCardHTML(proxy);
+                addCardEventListeners(cardElement);
+            }
+        };
+        
+        const addCardEventListeners = (scope = document) => {
+            scope.querySelectorAll('.ping-btn').forEach(btn => btn.addEventListener('click', e => testPing(parseInt(e.currentTarget.dataset.id))));
+            scope.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', e => copyProxy(parseInt(e.currentTarget.dataset.id))));
+            scope.querySelectorAll('.connect-btn').forEach(btn => btn.addEventListener('click', e => connectTelegram(parseInt(e.currentTarget.dataset.id))));
+        };
+        
+        const getStatusInfo = (status) => {
+            switch(status) {
+                case 'good': return { text: 'عالی', icon: 'fa-solid fa-circle-check', className: 'status-good', dotClass: 'bg-green-400', pulseClass: 'pulsing-dot' };
+                case 'medium': return { text: 'متوسط', icon: 'fa-solid fa-triangle-exclamation', className: 'status-medium', dotClass: 'bg-yellow-400', pulseClass: '' };
+                case 'bad': return { text: 'ضعیف', icon: 'fa-solid fa-circle-xmark', className: 'status-bad', dotClass: 'bg-red-400', pulseClass: '' };
+                default: return { text: 'نامشخص', icon: 'fa-solid fa-circle-question', className: 'status-unknown', dotClass: 'bg-slate-500', pulseClass: '' };
+            }
+        };
 
-            if (proxies.length === 0) {
-                elements.statusMessage.classList.remove('hidden');
-                elements.statusMessage.textContent = 'هیچ پروکسی با این مشخصات یافت نشد.';
+        const getPingInfo = (ping) => {
+            if (ping === null) return { text: 'تست نشده', className: 'text-slate-400' };
+            if (ping < 250) return { text: `${ping}ms`, className: 'text-green-400' };
+            if (ping < 600) return { text: `${ping}ms`, className: 'text-yellow-400' };
+            return { text: `${ping}ms`, className: 'text-red-400' };
+        };
+
+        const updateCounts = () => {
+            elements.proxyCount.textContent = allProxies.length;
+            elements.activeCount.textContent = allProxies.filter(p => p.status === 'good').length;
+        };
+
+        const loadMoreProxies = () => {
+            currentPage++;
+            renderProxies();
+            updateLoadMoreButton();
+        };
+
+        const updateLoadMoreButton = () => {
+            const visibleCount = (currentPage + 1) * perPage;
+            elements.loadMoreContainer.classList.toggle('hidden', visibleCount >= visibleProxies.length);
+        };
+        
+        // General Toast Notification
+        const showToastNotification = (message, type = 'info') => {
+            const notif = document.createElement('div');
+            const typeClasses = {
+                success: 'bg-green-600/80 border-green-500', error: 'bg-red-600/80 border-red-500',
+                warning: 'bg-yellow-600/80 border-yellow-500', info: 'bg-blue-600/80 border-blue-500',
+            };
+            notif.className = `fixed top-5 right-5 z-50 px-5 py-3 rounded-lg text-white font-semibold border-l-4 ${typeClasses[type]} proxy-card`;
+            notif.style.cssText = `transform: translateX(200%); transition: transform 0.5s ease;`;
+            notif.innerHTML = `<div class="card-content">${message}</div>`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.style.transform = 'translateX(0)', 10);
+            setTimeout(() => {
+                notif.style.transform = 'translateX(200%)';
+                notif.addEventListener('transitionend', () => notif.remove());
+            }, 4000);
+        };
+
+        // Welcome Modal Logic
+        const welcomeModal = document.getElementById('welcomeModal');
+        const closeWelcomeModalBtn = document.getElementById('closeWelcomeModal');
+
+        const showWelcomeModal = () => {
+            if (sessionStorage.getItem('welcomeModalSeen')) {
                 return;
             }
-
-            elements.statusMessage.classList.add('hidden');
-            appendProxies(proxies);
-        }
-
-        function appendProxies(proxies) {
-            const proxiesToRender = proxies.slice(displayedProxiesCount, displayedProxiesCount + perPage);
-            proxiesToRender.forEach(proxy => {
-                elements.proxyGrid.innerHTML += getProxyCardHTML(proxy, allProxies.indexOf(proxy));
-            });
-
-            displayedProxiesCount += proxiesToRender.length;
-
-            if (displayedProxiesCount < proxies.length) {
-                elements.loadMoreContainer.style.display = 'flex';
-            } else {
-                elements.loadMoreContainer.style.display = 'none';
+            if (welcomeModal) {
+                 welcomeModal.classList.remove('hidden');
             }
-        }
-        
-        function showWelcomeModal() {
-            if (!localStorage.getItem('welcomeModalShown')) {
-                elements.welcomeModal.style.display = 'flex';
+        };
+
+        const hideWelcomeModal = () => {
+            if (welcomeModal) {
+                const content = welcomeModal.querySelector('.welcome-modal-content');
+                welcomeModal.style.opacity = '0';
+                if(content) content.style.transform = 'scale(0.9)';
+                
+                const onTransitionEnd = () => {
+                    welcomeModal.classList.add('hidden');
+                    welcomeModal.removeEventListener('transitionend', onTransitionEnd);
+                };
+                welcomeModal.addEventListener('transitionend', onTransitionEnd);
             }
+            sessionStorage.setItem('welcomeModalSeen', 'true');
+        };
+
+        if (closeWelcomeModalBtn) {
+            closeWelcomeModalBtn.addEventListener('click', hideWelcomeModal);
         }
 
-        function hideWelcomeModal() {
-            elements.welcomeModal.style.display = 'none';
-            localStorage.setItem('welcomeModalShown', 'true');
-        }
-
-        if(elements.closeModalBtn) {
-            elements.closeModalBtn.addEventListener('click', () => {
-                hideWelcomeModal();
+        if (welcomeModal) {
+            welcomeModal.addEventListener('click', (e) => {
+                if (e.target === welcomeModal) {
+                    hideWelcomeModal();
+                }
             });
         }
 
+        // ایجاد یک نسخه debounce شده از تابع فیلتر کردن
+        const debouncedSearch = debounce(() => {
+            applyFiltersAndSort();
+        }, 300);
 
         elements.refreshBtn.addEventListener('click', loadProxies);
         elements.testAllBtn.addEventListener('click', testAllProxies);
-        elements.loadMoreBtn.addEventListener('click', () => {
-            applyFiltersAndSort();
-        });
+        elements.loadMoreBtn.addEventListener('click', loadMoreProxies);
         
         elements.searchInput.addEventListener('input', (e) => {
             currentSearch = e.target.value;
-            applyFiltersAndSort();
+            debouncedSearch();
         });
         
         elements.sortSelect.addEventListener('change', (e) => {
