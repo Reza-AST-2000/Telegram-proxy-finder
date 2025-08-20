@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta name="theme-color" content="#2f81f7">
-<meta name="background-color" content="#010409">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پروکسی یاب تلگرام</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- PWA Manifest & Meta Tags -->
     <link rel="manifest" href="/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -373,7 +370,6 @@
 </head>
 <body>
 
-    <!-- Welcome Modal Start -->
     <div id="welcomeModal" class="welcome-modal-overlay hidden">
         <div class="welcome-modal-content">
             <button id="closeWelcomeModal" class="welcome-modal-close">&times;</button>
@@ -388,8 +384,6 @@
             </a>
         </div>
     </div>
-    <!-- Welcome Modal End -->
-
     <main class="container mx-auto px-4 py-8 md:py-12 relative z-10">
 
         <header class="text-center mb-12 fade-in-up">
@@ -397,7 +391,6 @@
                 <div class="inline-block p-4 bg-gray-900/50 rounded-full border border-gray-800 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20">
                     <i class="fa-brands fa-telegram text-4xl text-white"></i>
                 </div>
-                <!-- دکمه تغییر تم -->
                 <button id="themeToggle" class="theme-toggle-btn">
                     <i id="themeIcon" class="fa-solid fa-moon"></i>
                 </button>
@@ -408,6 +401,7 @@
             <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
                 نسل جدید دسترسی به پروکسی‌های امن و پرسرعت MTProto
             </p>
+            <p id="lastUpdate" class="mt-4 text-sm text-slate-500"></p>
         </header>
 
         <section id="control-panel" class="proxy-card p-6 mb-8 fade-in-up" style="animation-delay: 0.2s;">
@@ -477,7 +471,6 @@
             </div>
         </div>
 
-        <!-- Skeleton Loading Cards -->
         <div id="skeletonList" class="proxy-grid">
             <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
             <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
@@ -510,7 +503,6 @@
         </div>
     </main>
 
-    <!-- Footer Section Start -->
     <footer class="text-center py-8 mt-12 border-t border-gray-800 text-slate-400 fade-in-up" style="animation-delay: 0.4s;">
         <div class="container mx-auto px-4">
             <div class="grid md:grid-cols-2 gap-8 items-center">
@@ -549,8 +541,6 @@
             </div>
         </div>
     </footer>
-    <!-- Footer Section End -->
-
     <script>
         // Interactive Glow Effect for Cards
         document.addEventListener('mousemove', e => {
@@ -625,7 +615,8 @@
             loadMoreBtn: document.getElementById('loadMoreBtn'),
             searchInput: document.getElementById('searchInput'),
             sortSelect: document.getElementById('sortSelect'),
-            perPageSelect: document.getElementById('perPageSelect')
+            perPageSelect: document.getElementById('perPageSelect'),
+            lastUpdate: document.getElementById('lastUpdate') // المان جدید برای نمایش تاریخ
         };
 
         const countryTranslations = {
@@ -636,6 +627,17 @@
         };
 
         const getCountryName = (country) => countryTranslations[country] || `🌍 ${country || 'نامشخص'}`;
+
+        // تابع debounce برای بهینه‌سازی فراخوانی توابع
+        const debounce = (func, delay) => {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(null, args);
+                }, delay);
+            };
+        };
 
         const loadProxies = async () => {
             if (isLoading) return;
@@ -653,6 +655,17 @@
                     country: getCountryName(p.country), ping: null, status: 'unknown'
                 }));
                 showToastNotification('✅ پروکسی‌ها با موفقیت بارگذاری شدند.', 'success');
+                
+                // --- کد جدید برای نمایش تاریخ و ساعت ---
+                const now = new Date();
+                const jalaali = new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', hour12: false
+                }).format(now);
+
+                elements.lastUpdate.textContent = `آخرین بروزرسانی: ${jalaali}`;
+                // ------------------------------------
+
             } catch (error) {
                 allProxies = [
                     { id: 0, server: "proxy.digitalresistance.dog", port: "443", secret: "ddd41d8cd98f00b204e9800998ecf8427e", country: "🇩🇪 آلمان", ping: null, status: 'unknown' },
@@ -660,6 +673,10 @@
                     { id: 2, server: "mtpro.co.uk", port: "443", secret: "ee0000000000000000000000000000000000", country: "🇬🇧 انگلستان", ping: null, status: 'unknown' },
                 ];
                 showToastNotification('⚠️ از لیست پیش‌فرض استفاده می‌شود.', 'warning');
+                elements.lastUpdate.textContent = `آخرین بروزرسانی: ${new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', hour12: false
+                }).format(new Date())}`;
             } finally {
                 elements.skeletonList.classList.add('hidden');
                 elements.proxyList.classList.remove('hidden');
@@ -924,26 +941,19 @@
             });
         }
 
+        // ایجاد یک نسخه debounce شده از تابع فیلتر کردن
+        const debouncedSearch = debounce(() => {
+            applyFiltersAndSort();
+        }, 300);
 
         elements.refreshBtn.addEventListener('click', loadProxies);
         elements.testAllBtn.addEventListener('click', testAllProxies);
         elements.loadMoreBtn.addEventListener('click', loadMoreProxies);
         
-        // تابع debounce عمومی
-const debounce = (func, delay) => {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), delay);
-    };
-};
-
-// استفاده در اینپوت جستجو
-elements.searchInput.addEventListener('input', debounce((e) => {
-    currentSearch = e.target.value;
-    applyFiltersAndSort();
-}, 300));
-
+        elements.searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            debouncedSearch(); // استفاده از نسخه debounce شده
+        });
         
         elements.sortSelect.addEventListener('change', (e) => {
             currentSort = e.target.value;
@@ -961,7 +971,6 @@ elements.searchInput.addEventListener('input', debounce((e) => {
         });
     </script>
 
-    <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -972,9 +981,7 @@ elements.searchInput.addEventListener('input', debounce((e) => {
         }
     </script>
     
-    <!-- PWA Install Script -->
     <script src="/pwa-install.js"></script>
 
 </body>
 </html>
-
