@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+<meta name="theme-color" content="#2f81f7">
+<meta name="background-color" content="#010409">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پروکسی یاب تلگرام</title>
@@ -927,10 +929,21 @@
         elements.testAllBtn.addEventListener('click', testAllProxies);
         elements.loadMoreBtn.addEventListener('click', loadMoreProxies);
         
-        elements.searchInput.addEventListener('input', (e) => {
-            currentSearch = e.target.value;
-            applyFiltersAndSort();
-        });
+        // تابع debounce عمومی
+const debounce = (func, delay) => {
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+};
+
+// استفاده در اینپوت جستجو
+elements.searchInput.addEventListener('input', debounce((e) => {
+    currentSearch = e.target.value;
+    applyFiltersAndSort();
+}, 300));
+
         
         elements.sortSelect.addEventListener('change', (e) => {
             currentSort = e.target.value;
