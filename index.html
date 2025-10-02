@@ -11,9 +11,7 @@
 
     <style>
         body {
-            /* فونت خانواده Vazirmatn اکنون در لینک بالا تعریف شده است */
             font-family: 'Vazirmatn', sans-serif; 
-            /* تنظیم رنگ‌های تم روشن */
             background-color: #f3f4f6; 
             color: #1f2937; 
             direction: rtl;
@@ -34,7 +32,6 @@
             color: #1f2937; 
         }
         
-        /* اصلاح رنگ‌بندی برای تم روشن */
         .input-group input, .input-group select, .result-box, .notification-box {
             background-color: #f9fafb; 
             border: 1px solid #d1d5db;
@@ -50,6 +47,7 @@
         #outputAmount {
             direction: ltr; 
             text-align: right;
+            /* تغییر رنگ متن خروجی در صورت نامعتبر بودن ورودی */
             color: #10B981; 
         }
         
@@ -97,6 +95,13 @@
         .custom-footer .text-green-400 {
             color: #4ade80; 
         }
+        
+        /* استایل برای پیام خطای ورودی */
+        .error-text {
+            color: #EF4444 !important; /* رنگ قرمز برای خطا */
+            direction: rtl !important;
+            text-align: right !important;
+        }
 
         /* استایل‌های انیمیشن */
         @keyframes fadeInUp {
@@ -143,7 +148,7 @@
                     <div class="w-2/5 relative">
                         <label for="inputCurrency" class="block text-sm font-medium mb-2">انتخاب ارز</label>
                         <select id="inputCurrency" onchange="switchCurrency(false)" class="w-full p-3 border rounded-lg text-lg appearance-none">
-                            </select>
+                        </select>
                         <i class="fa-solid fa-chevron-down absolute left-3 top-1/2 mt-3 text-gray-400 pointer-events-none"></i>
                     </div>
                 </div>
@@ -170,7 +175,7 @@
                     <div class="w-2/5 relative">
                         <label for="outputCurrency" class="block text-sm font-medium mb-2">انتخاب واحد</label>
                         <select id="outputCurrency" onchange="switchCurrency(true)" class="w-full p-3 border rounded-lg text-lg appearance-none">
-                             </select>
+                        </select>
                         <i class="fa-solid fa-chevron-down absolute left-3 top-1/2 mt-3 text-gray-400 pointer-events-none"></i>
                     </div>
                 </div>
@@ -228,13 +233,13 @@
 
     <script>
         // **********************************************
-        // ۱. داده‌های اصلی نرخ ارز 
+        // ۱. داده‌های اصلی نرخ ارز (نرخ دلار بر اساس اطلاعات شما به‌روز شد)
         // **********************************************
         const exchangeData = {
             updateDate: "۱۰ مهر ۱۴۰۴ (نرخ‌ها دقیق هستند)",
             rates: {
-                // نرخ‌های فعلی
-                "USD": { rate: 117860, name: "دلار آمریکا", unit: "$" }, 
+                // نرخ دلار بر اساس اطلاعات ذخیره‌شده کاربر: ۹۳,۰۰۰ تومان
+                "USD": { rate: 93000, name: "دلار آمریکا", unit: "$" }, 
                 "EUR": { rate: 138410, name: "یورو", unit: "€" }, 
                 "GBP": { rate: 159250, name: "پوند بریتانیا", unit: "£" },
                 "AED": { rate: 32111, name: "درهم امارات", unit: "د.ا." }, 
@@ -278,54 +283,18 @@
             baseCurrencyName: document.getElementById('baseCurrencyName'),
             customRateInput: document.getElementById('customRateInput'),
             updateInfo: document.getElementById('updateInfo'),
-            footerUpdateDate: document.getElementById('footerUpdateDate') // ب) عنصر جدید برای نمایش تاریخ در فوتر
+            footerUpdateDate: document.getElementById('footerUpdateDate') 
         };
         
         // **********************************************
         // ۲. توابع اصلی و کمکی
         // **********************************************
 
-        // تابع جدید: پر کردن لیست‌های انتخابی ارز
-        function populateCurrencies() {
-            const inputSelect = elements.inputCurrency;
-            const outputSelect = elements.outputCurrency;
-            
-            // ابتدا گزینه‌های قبلی را پاک کنید
-            inputSelect.innerHTML = '';
-            outputSelect.innerHTML = '';
-
-            const currencyCodes = Object.keys(exchangeData.rates);
-            
-            currencyCodes.forEach(code => {
-                const currency = exchangeData.rates[code];
-                
-                // از ایموجی‌های داخل HTML استفاده می‌کنیم
-                const optionText = inputSelect.querySelector(`option[value="${code}"]`) ? inputSelect.querySelector(`option[value="${code}"]`).textContent : `${code} - ${currency.name}`;
-                
-                const optionInput = new Option(optionText, code);
-                const optionOutput = new Option(optionText, code);
-                
-                // برای جلوگیری از مشکل در HTML که از قبل گزینه ها را نداریم
-                // اگر از روش کاملاً جاوا اسکریپتی استفاده می کنید، می توانید خطوط زیر را فعال کنید:
-                // inputSelect.add(optionInput);
-                // outputSelect.add(optionOutput);
-
-                // با توجه به ساختار فعلی HTML شما که گزینه‌ها حذف شده، مجددا آنها را از روی دیتا تعریف می‌کنم.
-                inputSelect.appendChild(createOptionElement(code, currency.name));
-                outputSelect.appendChild(createOptionElement(code, currency.name));
-            });
-            
-            // تنظیم مقادیر پیش‌فرض
-            inputSelect.value = 'USD';
-            outputSelect.value = 'IRR'; 
-        }
-
         // تابع کمکی برای ساخت المان option
         function createOptionElement(code, name) {
             const option = document.createElement('option');
             option.value = code;
             
-            // اضافه کردن پرچم‌ها به صورت دستی یا از دیتای اصلی
             const flags = {
                 "USD": "🇺🇸", "EUR": "🇪🇺", "GBP": "🇬🇧", "CHF": "🇨🇭", "CAD": "🇨🇦", "AUD": "🇦🇺",
                 "SEK": "🇸🇪", "NOK": "🇳🇴", "RUB": "🇷🇺", "THB": "🇹🇭", "SGD": "🇸🇬", "HKD": "🇭🇰",
@@ -337,6 +306,30 @@
             option.textContent = (flags[code] || '') + ' ' + name + (code === 'IRR' ? '/ریال' : '');
             return option;
         }
+
+        // تابع جدید: پر کردن لیست‌های انتخابی ارز (بهبود ساختار)
+        function populateCurrencies() {
+            const inputSelect = elements.inputCurrency;
+            const outputSelect = elements.outputCurrency;
+            
+            inputSelect.innerHTML = '';
+            outputSelect.innerHTML = '';
+
+            const currencyCodes = Object.keys(exchangeData.rates);
+            
+            currencyCodes.forEach(code => {
+                const currency = exchangeData.rates[code];
+                
+                // ایجاد و اضافه کردن option به هر دو لیست
+                inputSelect.appendChild(createOptionElement(code, currency.name).cloneNode(true));
+                outputSelect.appendChild(createOptionElement(code, currency.name).cloneNode(true));
+            });
+            
+            // تنظیم مقادیر پیش‌فرض
+            inputSelect.value = 'USD';
+            outputSelect.value = 'IRR'; 
+        }
+
 
         function switchCurrency(isOutputChange) {
             calculate();
@@ -352,10 +345,15 @@
             calculate();
         }
 
-        // ج) تابع جدید: کپی کردن نتیجه
+        // تابع کپی کردن نتیجه
         function copyToClipboard() {
-            const textToCopy = elements.outputAmount.textContent.replace(/,/g, '').replace(/،/g, ''); // حذف جداکننده
+            const textToCopy = elements.outputAmount.textContent.replace(/,/g, '').replace(/،/g, ''); 
             
+            if (textToCopy === 'ورودی نامعتبر' || isNaN(parseFloat(textToCopy))) {
+                 alert("خطا: نتیجه‌ای برای کپی کردن وجود ندارد.");
+                 return;
+            }
+
             navigator.clipboard.writeText(textToCopy).then(() => {
                 alert("مبلغ کپی شد: " + textToCopy);
             }).catch(err => {
@@ -364,9 +362,30 @@
         }
         
         function calculate() {
-            const amount = parseFloat(elements.inputAmount.value) || 0;
+            const inputValue = elements.inputAmount.value;
+            const amount = parseFloat(inputValue);
             const inputCode = elements.inputCurrency.value;
             const outputCode = elements.outputCurrency.value;
+
+            // --- اعتبارسنجی ورودی و اعلان‌های کاربردی ---
+            if (isNaN(amount) || amount <= 0 || inputValue.trim() === '') {
+                // اگر ورودی نامعتبر است یا صفر و منفی، پیام خطا نمایش داده شود
+                elements.outputAmount.textContent = 'ورودی نامعتبر';
+                elements.outputAmount.classList.add('error-text'); // اضافه کردن استایل خطا
+                
+                // همچنین برای نرخ پایه هم مقادیر را خالی کنید
+                elements.baseRateDisplay.textContent = '---';
+                elements.baseCurrencyName.textContent = 'نرخ';
+                
+                // اطلاعات به‌روزرسانی در فوتر همچنان نمایش داده شود
+                elements.footerUpdateDate.textContent = exchangeData.updateDate.split('(')[0].trim();
+                elements.updateInfo.textContent = `آخرین بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
+                
+                return; // از ادامه محاسبات صرف نظر کنید
+            }
+            // حذف استایل خطا در صورت معتبر بودن ورودی
+            elements.outputAmount.classList.remove('error-text'); 
+            // --- پایان اعتبارسنجی ---
             
             let rateInputToBase = exchangeData.rates[inputCode].rate;
             let rateOutputToBase = exchangeData.rates[outputCode].rate;
@@ -389,9 +408,9 @@
                  elements.baseCurrencyName.textContent = 'نرخ';
             }
             
-            // ب) نمایش تاریخ به‌روزرسانی در اعلان و فوتر
+            // نمایش تاریخ به‌روزرسانی در اعلان و فوتر
             elements.updateInfo.textContent = `آخرین بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
-            elements.footerUpdateDate.textContent = exchangeData.updateDate.split('(')[0].trim(); // نمایش فقط تاریخ
+            elements.footerUpdateDate.textContent = exchangeData.updateDate.split('(')[0].trim(); 
             
             // تنظیم برچسب‌ها
             elements.inputLabel.textContent = `مقدار ${exchangeData.rates[inputCode].name}`;
@@ -429,7 +448,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // استفاده از تابع برای تولید لیست ارزها
             populateCurrencies(); 
             calculate(); 
         });
