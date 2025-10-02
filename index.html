@@ -16,19 +16,22 @@
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #eef2ff; /* پس زمینه روشن و ملایم */
-            color: #1f2937;
+            background-color: #eef2ff; /* پس زمینه کلی روشن و ملایم */
+            color: #1f2937; /* متن اصلی تیره */
             direction: rtl;
         }
         .card {
-            background-color: #ffffff;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            border: 1px solid #ddd;
+            /* این قسمت تغییر کرده است: پس زمینه کارت اصلی */
+            background-color: #00BCD4; /* رنگ آبی فیروزه‌ای از تصویر */
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25); /* سایه کمی قوی‌تر */
+            border: 1px solid #0097A7; /* حاشیه کمی تیره‌تر */
+            color: #f0f0f0; /* رنگ متن داخل کارت برای خوانایی بهتر */
         }
+        /* استایل اختصاصی برای ورودی‌ها و منوی کشویی */
         .input-group input, .input-group select {
-            background-color: #f9fafb;
+            background-color: #ffffff; /* ورودی‌ها سفید بمانند */
             border: 1px solid #d1d5db;
-            color: #1f2937;
+            color: #1f2937; /* متن ورودی‌ها تیره */
             transition: all 0.2s;
         }
         .input-group input:focus, .input-group select:focus {
@@ -40,17 +43,38 @@
         #outputAmount {
             direction: ltr; 
             text-align: right;
-            color: #059669; 
+            color: #059669; /* سبز برای نتیجه نهایی */
         }
         .result-box {
-            background-color: #f0f4f8;
-            border: 1px solid #d1d5db;
+            background-color: #e0f7fa; /* پس‌زمینه روشن برای باکس نتیجه */
+            border: 1px solid #00BCD4; /* حاشیه همرنگ کارت */
         }
         .switch-button {
             transition: transform 0.3s ease;
+            background-color: #00838F; /* رنگ کمی تیره‌تر از کارت */
         }
         .switch-button:hover {
             transform: scale(1.05);
+            background-color: #0097A7;
+        }
+        /* تنظیم رنگ‌های متن در قسمت‌های مختلف کارت */
+        .card h1, .card p, .card label {
+            color: #ffffff; /* عنوان‌ها و لیبل‌ها سفید شوند */
+        }
+        .card .text-gray-500 {
+             color: #e0e0e0; /* متن توضیحات کمی روشن‌تر */
+        }
+        .card .text-gray-700 {
+             color: #f0f0f0; /* لیبل‌ها و متن‌های مشابه سفید شوند */
+        }
+        /* بخش اعلان نرخ */
+        .notification-box {
+            background-color: #e0f7fa; /* پس زمینه روشن برای اعلان نرخ */
+            border-color: #00BCD4; /* حاشیه همرنگ کارت */
+            color: #1f2937; /* متن اعلان تیره */
+        }
+        .notification-box .fa-bell, .notification-box .text-indigo-800 {
+            color: #00BCD4; /* آیکون و نرخ اصلی همرنگ کارت */
         }
     </style>
 </head>
@@ -58,57 +82,59 @@
 
     <div class="w-full max-w-lg mt-10 card p-6 md:p-10 rounded-2xl">
         <header class="text-center mb-8">
-            <i class="fa-solid fa-arrow-right-arrow-left text-4xl text-indigo-600 mb-3"></i>
-            <h1 class="text-3xl font-extrabold text-gray-900">مبدل تبدیل ارز</h1>
+            <i class="fa-solid fa-arrow-right-arrow-left text-4xl text-white mb-3"></i>
+            <h1 class="text-3xl font-extrabold">مبدل تبدیل ارز</h1>
             <p class="text-gray-500 mt-2">تبدیل دوطرفه ارزهای اصلی بر اساس نرخ روز بازار</p>
         </header>
 
-        <div class="bg-indigo-50 border-r-4 border-indigo-600 p-4 mb-8 rounded-lg text-gray-700 shadow-md">
+        <div class="notification-box border-r-4 p-4 mb-8 rounded-lg shadow-md">
             <div class="flex items-center">
-                <i class="fa-solid fa-bell text-indigo-600 ml-2"></i>
+                <i class="fa-solid fa-bell ml-2"></i>
                 <span class="font-bold" id="baseCurrencyName"></span> 
             </div>
-            <span id="baseRateDisplay" class="font-extrabold text-2xl text-indigo-800 block mt-2"></span> تومان
+            <span id="baseRateDisplay" class="font-extrabold text-2xl block mt-2"></span> تومان
             <p class="text-xs mt-1 text-gray-500" id="updateInfo"></p>
         </div>
 
         <div class="mb-6">
             <div class="input-group flex gap-3 mb-3">
                 <div class="w-3/5">
-                    <label for="inputAmount" class="block text-sm font-medium mb-2 text-gray-700" id="inputLabel">مقدار ارز</label>
+                    <label for="inputAmount" class="block text-sm font-medium mb-2" id="inputLabel">مقدار ارز</label>
                     <input type="number" id="inputAmount" oninput="calculate()" class="w-full p-3 pr-4 border rounded-lg text-lg" placeholder="مبلغ را وارد کنید" value="1">
                 </div>
                 <div class="w-2/5 relative">
-                    <label for="inputCurrency" class="block text-sm font-medium mb-2 text-gray-700" id="inputUnitLabel">انتخاب ارز</label>
+                    <label for="inputCurrency" class="block text-sm font-medium mb-2" id="inputUnitLabel">انتخاب ارز</label>
                     <select id="inputCurrency" onchange="switchCurrency(false)" class="w-full p-3 border rounded-lg text-lg appearance-none">
                         <option value="USD">🇺🇸 دلار آمریکا</option>
                         <option value="EUR">🇪🇺 یورو</option>
                         <option value="GBP">🇬🇧 پوند بریتانیا</option>
                         <option value="AED">🇦🇪 درهم امارات</option>
                         <option value="AZN">🇦🇿 منات آذربایجان</option>
-                        <option value="IRR" selected>🇮🇷 تومان/ریال</option> </select>
+                        <option value="IRR" selected>🇮🇷 تومان/ریال</option>
+                    </select>
                     <i class="fa-solid fa-chevron-down absolute left-3 top-1/2 mt-3 text-gray-400 pointer-events-none"></i>
                 </div>
             </div>
 
             <div class="flex justify-center my-3">
-                <button onclick="swapCurrencies()" class="switch-button p-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full shadow-lg">
+                <button onclick="swapCurrencies()" class="switch-button p-2 text-white rounded-full shadow-lg">
                     <i class="fa-solid fa-arrows-up-down"></i>
                 </button>
             </div>
 
             <div class="input-group flex gap-3">
                 <div class="w-3/5">
-                    <label for="outputAmount" class="block text-sm font-medium mb-2 text-gray-700" id="outputLabel">معادل تومان</label>
+                    <label for="outputAmount" class="block text-sm font-medium mb-2" id="outputLabel">معادل تومان</label>
                     <div class="relative result-box p-4 rounded-lg shadow-inner">
                         <p id="outputAmount" class="text-4xl font-extrabold">۰</p>
                         <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold" id="outputUnitDisplay">تومان</span>
                     </div>
                 </div>
                 <div class="w-2/5 relative">
-                    <label for="outputCurrency" class="block text-sm font-medium mb-2 text-gray-700" id="outputUnitLabelFixed">انتخاب واحد</label>
+                    <label for="outputCurrency" class="block text-sm font-medium mb-2" id="outputUnitLabelFixed">انتخاب واحد</label>
                     <select id="outputCurrency" onchange="switchCurrency(true)" class="w-full p-3 border rounded-lg text-lg appearance-none">
-                        <option value="IRR">🇮🇷 تومان/ریال</option> <option value="USD" selected>🇺🇸 دلار آمریکا</option>
+                        <option value="IRR">🇮🇷 تومان/ریال</option>
+                        <option value="USD" selected>🇺🇸 دلار آمریکا</option>
                         <option value="EUR">🇪🇺 یورو</option>
                         <option value="GBP">🇬🇧 پوند بریتانیا</option>
                         <option value="AED">🇦🇪 درهم امارات</option>
@@ -119,13 +145,13 @@
             </div>
         </div>
         
-        <div class="border-t border-gray-200 pt-4">
-            <label for="customRateInput" class="block text-sm font-medium mb-2 text-gray-700">نرخ سفارشی (برای محاسبات دلخواه)</label>
+        <div class="border-t border-gray-400 pt-4">
+            <label for="customRateInput" class="block text-sm font-medium mb-2">نرخ سفارشی (برای محاسبات دلخواه)</label>
             <div class="relative">
                 <input type="number" id="customRateInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="نرخ دلخواه را وارد کنید">
                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">تومان</span>
             </div>
-            <button onclick="resetRate()" class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition">بازنشانی به نرخ پایه بازار</button>
+            <button onclick="resetRate()" class="mt-3 text-sm text-white hover:text-gray-200 font-medium transition">بازنشانی به نرخ پایه بازار</button>
         </div>
         
     </div>
@@ -142,7 +168,7 @@
                 "GBP": { rate: 159250, name: "پوند بریتانیا", unit: "£" },
                 "AED": { rate: 32111, name: "درهم امارات", unit: "د.ا." }, 
                 "AZN": { rate: 69300, name: "منات آذربایجان", unit: "₼" },
-                "IRR": { rate: 1, name: "تومان", unit: "تومان" } // تومان نرخ پایه ۱ در نظر گرفته شد
+                "IRR": { rate: 1, name: "تومان", unit: "تومان" } 
             }
         };
 
@@ -164,22 +190,17 @@
         // ۲. توابع اصلی
         // **********************************************
 
-        // تابع سوئیچ دستی برای به روز رسانی نرخ
         function switchCurrency(isOutputChange) {
-            // اگر کاربر در حال تغییر ارز ورودی یا خروجی است، فقط محاسبه مجدد انجام شود.
             calculate();
         }
 
-        // تابع تعویض جهت تبدیل (فلش بالا و پایین)
         function swapCurrencies() {
             const inputVal = elements.inputCurrency.value;
             const outputVal = elements.outputCurrency.value;
             
-            // تعویض مقادیر منوهای کشویی
             elements.inputCurrency.value = outputVal;
             elements.outputCurrency.value = inputVal;
             
-            // بلافاصله محاسبه و به‌روزرسانی برچسب‌ها
             calculate();
         }
         
@@ -188,83 +209,70 @@
             const inputCode = elements.inputCurrency.value;
             const outputCode = elements.outputCurrency.value;
             
-            // نرخ تبدیل را بر اساس نرخ پایه (USD/IRR) محاسبه کنید
             let rateInputToBase = exchangeData.rates[inputCode].rate;
             let rateOutputToBase = exchangeData.rates[outputCode].rate;
             
-            // ۱. تعیین نرخ مورد استفاده (نرخ سفارشی فقط برای ارز ورودی فعال)
-            let currentRate = rateInputToBase;
+            let currentRate = rateInputToBase; // نرخ فعلی ارز ورودی
             if (elements.customRateInput.value && !isNaN(parseFloat(elements.customRateInput.value))) {
                 currentRate = parseFloat(elements.customRateInput.value);
             }
             
-            // اگر ارز ورودی تومان باشد، نرخ سفارشی اعمال نمی‌شود
-            if (inputCode === 'IRR') {
-                 // اگر تبدیل از تومان به ارز دیگر است، نرخ ارز دیگر (outputCode) باید نمایش داده شود
+            // نمایش نرخ پایه در اعلان بالا
+            if (inputCode === 'IRR' && outputCode !== 'IRR') {
+                 // تبدیل از تومان به ارز دیگر: نرخ ارز خروجی به تومان را نمایش بده
                  elements.baseRateDisplay.textContent = formatNumber(rateOutputToBase);
                  elements.baseCurrencyName.textContent = `نرخ ${exchangeData.rates[outputCode].name} آزاد:`;
-                 elements.updateInfo.textContent = `بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
-            } else {
-                 // اگر تبدیل از ارز به تومان است، نرخ ارز ورودی باید نمایش داده شود
+            } else if (inputCode !== 'IRR') {
+                 // تبدیل از ارز به تومان یا ارز دیگر: نرخ ارز ورودی به تومان را نمایش بده
                  elements.baseRateDisplay.textContent = formatNumber(currentRate);
                  elements.baseCurrencyName.textContent = `نرخ ${exchangeData.rates[inputCode].name} آزاد:`;
-                 elements.updateInfo.textContent = `بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
+            } else {
+                 // هر دو تومان هستند یا یک مورد IRR و دیگری IRR است (نباید اتفاق بیفتد)
+                 elements.baseRateDisplay.textContent = '---';
+                 elements.baseCurrencyName.textContent = 'نرخ';
             }
+            elements.updateInfo.textContent = `بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
 
-            // ۲. تنظیم برچسب‌ها
+            // تنظیم برچسب‌ها
             elements.inputLabel.textContent = `مقدار ${exchangeData.rates[inputCode].name}`;
             elements.outputLabel.textContent = `معادل ${exchangeData.rates[outputCode].name}`;
             elements.outputUnitDisplay.textContent = exchangeData.rates[outputCode].unit;
 
-
-            // ۳. انجام محاسبات (تبدیل به پایه و سپس به مقصد)
+            // انجام محاسبات
             let resultAmount;
             
-            // نرخ محاسبه برای هر واحد ارز به تومان (یا نرخ سفارشی)
-            let ratePerUnitToToman = (inputCode === 'IRR') ? 1 : currentRate; 
-            
-            // اگر تبدیل از ارز به تومان است
-            if (outputCode === 'IRR') {
-                resultAmount = amount * ratePerUnitToToman;
-            } 
-            // اگر تبدیل از تومان به ارز دیگر است
-            else if (inputCode === 'IRR') {
-                // اگر ارز خروجی دلار باشد (مثال: تومان به دلار)
+            if (inputCode === 'IRR') { // تبدیل از تومان به ارز دیگر
                 resultAmount = amount / rateOutputToBase; 
-            }
-            // اگر تبدیل بین دو ارز است (مثلاً دلار به یورو)
-            else {
-                // تبدیل به تومان و سپس از تومان به ارز مقصد
-                const amountInToman = amount * ratePerUnitToToman;
+            } else if (outputCode === 'IRR') { // تبدیل از ارز دیگر به تومان
+                resultAmount = amount * currentRate;
+            } else { // تبدیل بین دو ارز (مثلاً دلار به یورو)
+                const amountInToman = amount * currentRate;
                 resultAmount = amountInToman / rateOutputToBase;
             }
 
-            // ۴. نمایش نتیجه
             elements.outputAmount.textContent = formatNumber(resultAmount, outputCode === 'IRR' ? 0 : 4);
         }
         
-        // تابع برای بازنشانی فیلد نرخ سفارشی
         function resetRate() {
             elements.customRateInput.value = '';
             calculate();
         }
 
-        // تابع کمکی برای فرمت کردن اعداد (اضافه کردن جداکننده هزارگان و اعشار)
         function formatNumber(num, decimalPlaces = 0) {
             if (isNaN(num)) return '۰';
             
-            // برای تبدیل‌های معکوس یا بین ارزی، نیاز به نمایش اعشار داریم
-            const formatted = num.toFixed(decimalPlaces).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            // برای نمایش اعشار در ارزها
+            const formatted = num.toFixed(decimalPlaces);
             
-            // جایگزینی ممیز فارسی
-            return formatted.replace('.', '/').replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+            // جداکننده هزارگان و اعشار فارسی
+            const parts = formatted.split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join('/').replace(/(\d)/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
         }
 
-        // اجرای اولیه هنگام بارگذاری صفحه
         document.addEventListener('DOMContentLoaded', () => {
-            // تنظیم اولیه منوها: دلار به تومان
-            elements.inputCurrency.value = 'USD';
-            elements.outputCurrency.value = 'IRR';
+            elements.inputCurrency.value = 'USD'; // پیش‌فرض اولیه
+            elements.outputCurrency.value = 'IRR'; // پیش‌فرض اولیه
             calculate(); 
         });
 
