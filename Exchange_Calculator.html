@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ماشین حساب تبدیل ارز</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* فونت فارسی Vazirmatn */
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+            font-weight: 400;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f8f8f8;
+            direction: rtl;
+        }
+        .card {
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+        }
+        /* تمرکز روی فیلد ورودی */
+        .input-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        /* نمایش نتیجه تومان به صورت چپ‌چین (برای خوانایی اعداد) */
+        #tomanOutput {
+            direction: ltr; 
+            text-align: right;
+        }
+    </style>
+</head>
+<body class="p-4 flex items-start justify-center min-h-screen">
+
+    <div class="w-full max-w-lg mt-10 card p-6 md:p-10 rounded-xl">
+        <header class="text-center mb-8">
+            <i class="fa-solid fa-calculator text-4xl text-blue-600 mb-3"></i>
+            <h1 class="text-3xl font-extrabold text-gray-800">ماشین حساب نرخ ارز</h1>
+            <p class="text-gray-500 mt-2">تبدیل سریع دلار به تومان بر اساس نرخ روز</p>
+        </header>
+
+        <div class="bg-blue-50 border-r-4 border-blue-600 p-4 mb-8 rounded-lg text-gray-700">
+            <i class="fa-solid fa-bell text-blue-600 ml-2"></i>
+            <span class="font-bold">نرخ پایه (دلار):</span> 
+            <span id="baseRateDisplay" class="font-extrabold text-lg text-blue-800"></span> تومان
+            <p class="text-sm mt-1 text-gray-500" id="updateInfo"></p>
+        </div>
+
+        <div class="input-group mb-6">
+            <label for="dollarInput" class="block text-sm font-medium text-gray-700 mb-2">مقدار دلار ($)</label>
+            <div class="relative">
+                <input type="number" id="dollarInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="مقدار دلار را وارد کنید (مثلاً ۱۰۰)" value="1">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold">$</span>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <label class="block text-sm font-medium text-gray-700 mb-2">معادل تومان</label>
+            <div class="relative bg-gray-100 p-4 rounded-lg border border-gray-200">
+                <p id="tomanOutput" class="text-3xl font-extrabold text-green-700">
+                    ۰
+                </p>
+                <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">تومان</span>
+            </div>
+        </div>
+        
+        <div class="border-t pt-4">
+            <label for="customRateInput" class="block text-sm font-medium text-gray-700 mb-2">نرخ سفارشی (برای محاسبات دلخواه)</label>
+            <div class="relative">
+                <input type="number" id="customRateInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="مثلاً ۹۰۰۰۰">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold">تومان</span>
+            </div>
+            <button onclick="resetRate()" class="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium">بازنشانی به نرخ پایه</button>
+        </div>
+        
+    </div>
+
+    <script>
+        // **********************************************
+        // ۱. داده‌های اصلی نرخ ارز (داخل همین فایل HTML)
+        // **********************************************
+        const exchangeData = {
+            // این نرخ از اطلاعات ذخیره شده شما گرفته شده است: [2025-08-16] Today's price of dollar is 93,000 Tomans.
+            baseRate: 93000, 
+            updateDate: "۱۶ مرداد ۱۴۰۴" // تاریخ به‌روزرسانی
+        };
+
+        // **********************************************
+        // ۲. توابع اصلی محاسبه و نمایش
+        // **********************************************
+        
+        // تابع محاسبه و نمایش نتیجه
+        function calculate() {
+            const dollarInput = document.getElementById('dollarInput').value;
+            const customRateInput = document.getElementById('customRateInput').value;
+            
+            // ۱. تعیین نرخ مورد استفاده
+            let rate = exchangeData.baseRate;
+            // اگر کاربر در فیلد سفارشی عدد معتبری وارد کرده باشد، از آن استفاده می‌شود.
+            if (customRateInput && !isNaN(parseFloat(customRateInput))) {
+                rate = parseFloat(customRateInput);
+            }
+
+            // ۲. انجام محاسبات
+            const dollarAmount = parseFloat(dollarInput) || 0;
+            const tomanAmount = dollarAmount * rate;
+
+            // ۳. نمایش نرخ پایه و اطلاعات
+            document.getElementById('baseRateDisplay').textContent = formatNumber(exchangeData.baseRate);
+            document.getElementById('updateInfo').textContent = `بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
+
+            // ۴. نمایش نتیجه تبدیل شده در خروجی
+            document.getElementById('tomanOutput').textContent = formatNumber(tomanAmount);
+        }
+        
+        // تابع برای بازنشانی فیلد نرخ سفارشی
+        function resetRate() {
+            document.getElementById('customRateInput').value = '';
+            calculate();
+        }
+
+        // تابع کمکی برای فرمت کردن اعداد (اضافه کردن جداکننده هزارگان)
+        function formatNumber(num) {
+            if (isNaN(num)) return '۰';
+            return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // اجرای اولیه هنگام بارگذاری صفحه
+        document.addEventListener('DOMContentLoaded', () => {
+            calculate(); // یک بار اجرا می‌شود تا نتایج اولیه را نمایش دهد.
+        });
+
+    </script>
+</body>
+</html>
