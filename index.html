@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ماشین حساب تبدیل چند ارزی</title>
+    <title>ماشین حساب تبدیل چند ارزی | حرفه‌ای</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -16,50 +16,64 @@
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #f8f8f8;
+            /* پس زمینه تیره مدرن */
+            background-color: #121212; 
+            color: #e0e0e0;
             direction: rtl;
         }
         .card {
-            background-color: #ffffff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e0e0e0;
+            /* کارت با رنگ خاکستری تیره */
+            background-color: #1f1f1f;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+        /* استایل اختصاصی برای ورودی‌ها و منوی کشویی */
+        .input-group input, .input-group select {
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            transition: all 0.2s;
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            border-color: #00bcd4; /* رنگ آبی فیروزه‌ای جذاب */
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.3);
         }
         /* نمایش نتیجه تومان به صورت چپ‌چین */
         #tomanOutput {
             direction: ltr; 
             text-align: right;
+            color: #4caf50; /* سبز روشن و جذاب */
+        }
+        .result-box {
+            background-color: #2c2c2c;
+            border: 1px solid #444;
         }
     </style>
 </head>
 <body class="p-4 flex items-start justify-center min-h-screen">
 
-    <div class="w-full max-w-lg mt-10 card p-6 md:p-10 rounded-xl">
-        <header class="text-center mb-8">
-            <i class="fa-solid fa-calculator text-4xl text-blue-600 mb-3"></i>
-            <h1 class="text-3xl font-extrabold text-gray-800">ماشین حساب تبدیل چند ارزی</h1>
-            <p class="text-gray-500 mt-2">نرخ ارزهای اصلی به تومان بر اساس نرخ روز بازار</p>
+    <div class="w-full max-w-lg mt-10 card p-6 md:p-10 rounded-2xl"> <header class="text-center mb-8">
+            <i class="fa-solid fa-calculator text-4xl text-cyan-400 mb-3"></i>
+            <h1 class="text-3xl font-extrabold text-white">ماشین حساب تبدیل چند ارزی</h1>
+            <p class="text-gray-400 mt-2">نرخ ارزهای اصلی به تومان بر اساس نرخ روز بازار</p>
         </header>
 
-        <div class="bg-blue-50 border-r-4 border-blue-600 p-4 mb-8 rounded-lg text-gray-700">
-            <i class="fa-solid fa-bell text-blue-600 ml-2"></i>
+        <div class="bg-blue-900/40 border-r-4 border-cyan-400 p-4 mb-8 rounded-lg text-gray-200 shadow-lg">
+            <i class="fa-solid fa-bell text-cyan-400 ml-2"></i>
             <span class="font-bold" id="currentCurrencyName">نرخ ارز:</span> 
-            <span id="baseRateDisplay" class="font-extrabold text-lg text-blue-800"></span> تومان
-            <p class="text-sm mt-1 text-gray-500" id="updateInfo"></p>
+            <span id="baseRateDisplay" class="font-extrabold text-lg text-cyan-300"></span> تومان
+            <p class="text-sm mt-1 text-gray-400" id="updateInfo"></p>
         </div>
 
         <div class="input-group mb-6 flex gap-3">
             <div class="w-3/5">
-                <label for="amountInput" class="block text-sm font-medium text-gray-700 mb-2">مقدار ارز</label>
-                <input type="number" id="amountInput" oninput="calculate()" class="w-full p-3 pr-4 border rounded-lg text-lg focus:ring-blue-500" placeholder="مقدار را وارد کنید" value="1">
+                <label for="amountInput" class="block text-sm font-medium mb-2 text-gray-300">مقدار ارز</label>
+                <input type="number" id="amountInput" oninput="calculate()" class="w-full p-3 pr-4 border rounded-lg text-lg" placeholder="مقدار را وارد کنید" value="1">
             </div>
             <div class="w-2/5 relative">
-                <label for="currencySelect" class="block text-sm font-medium text-gray-700 mb-2">انتخاب ارز</label>
-                <select id="currencySelect" onchange="calculate()" class="w-full bg-white p-3 border rounded-lg text-lg appearance-none focus:ring-blue-500">
+                <label for="currencySelect" class="block text-sm font-medium mb-2 text-gray-300">انتخاب ارز</label>
+                <select id="currencySelect" onchange="calculate()" class="w-full p-3 border rounded-lg text-lg appearance-none">
                     <option value="USD">🇺🇸 دلار آمریکا</option>
                     <option value="EUR">🇪🇺 یورو</option>
                     <option value="GBP">🇬🇧 پوند بریتانیا</option>
@@ -71,22 +85,22 @@
         </div>
 
         <div class="mb-8">
-            <label class="block text-sm font-medium text-gray-700 mb-2">معادل تومان</label>
-            <div class="relative bg-gray-100 p-4 rounded-lg border border-gray-200">
-                <p id="tomanOutput" class="text-3xl font-extrabold text-green-700">
+            <label class="block text-sm font-medium mb-2 text-gray-300">معادل تومان</label>
+            <div class="relative result-box p-4 rounded-lg shadow-inner">
+                <p id="tomanOutput" class="text-4xl font-extrabold">
                     ۰
                 </p>
-                <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">تومان</span>
+                <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold">تومان</span>
             </div>
         </div>
         
-        <div class="border-t pt-4">
-            <label for="customRateInput" class="block text-sm font-medium text-gray-700 mb-2">نرخ سفارشی (برای محاسبات دلخواه)</label>
+        <div class="border-t border-gray-700 pt-4">
+            <label for="customRateInput" class="block text-sm font-medium mb-2 text-gray-300">نرخ سفارشی (برای محاسبات دلخواه)</label>
             <div class="relative">
-                <input type="number" id="customRateInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="مثلاً ۱۲۰۰۰۰">
+                <input type="number" id="customRateInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="نرخ دلخواه را وارد کنید">
                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold">تومان</span>
             </div>
-            <button onclick="resetRate()" class="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium">بازنشانی به نرخ پایه بازار</button>
+            <button onclick="resetRate()" class="mt-3 text-sm text-cyan-400 hover:text-cyan-300 font-medium transition">بازنشانی به نرخ پایه بازار</button>
         </div>
         
     </div>
@@ -97,13 +111,12 @@
         // **********************************************
         const exchangeData = {
             updateDate: "۱۰ مهر ۱۴۰۴",
-            // نرخ‌های تقریبی بازار آزاد بر اساس آخرین قیمت‌ها
             rates: {
                 "USD": { rate: 117860, name: "دلار آمریکا" }, 
                 "EUR": { rate: 138410, name: "یورو" }, 
-                "GBP": { rate: 159250, name: "پوند بریتانیا" }, // نرخ جدید
+                "GBP": { rate: 159250, name: "پوند بریتانیا" },
                 "AED": { rate: 32111, name: "درهم امارات" }, 
-                "AZN": { rate: 69300, name: "منات آذربایجان" }  // نرخ جدید (تخمینی)
+                "AZN": { rate: 69300, name: "منات آذربایجان" }
             }
         };
 
@@ -116,44 +129,35 @@
             const customRateInput = document.getElementById('customRateInput').value;
             const selectedCurrency = document.getElementById('currencySelect').value;
             
-            // گرفتن نرخ پایه ارز انتخابی از لیست داده‌ها
             const baseRateData = exchangeData.rates[selectedCurrency];
-            // اگر ارزی پیدا نشد، نرخ را صفر در نظر می‌گیرد
             const baseRate = baseRateData ? baseRateData.rate : 0;
             const currencyName = baseRateData ? baseRateData.name : 'ارز';
 
-            // ۱. تعیین نرخ مورد استفاده (اول سفارشی، بعد نرخ پایه)
             let rate = baseRate;
             if (customRateInput && !isNaN(parseFloat(customRateInput))) {
                 rate = parseFloat(customRateInput);
             }
 
-            // ۲. انجام محاسبات
             const amount = parseFloat(amountInput) || 0;
             const tomanAmount = amount * rate;
 
-            // ۳. نمایش نرخ پایه و اطلاعات
             document.getElementById('currentCurrencyName').textContent = `نرخ ${currencyName} آزاد:`;
             document.getElementById('baseRateDisplay').textContent = formatNumber(baseRate);
             document.getElementById('updateInfo').textContent = `بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
 
-            // ۴. نمایش نتیجه تبدیل شده
             document.getElementById('tomanOutput').textContent = formatNumber(tomanAmount);
         }
         
-        // تابع برای بازنشانی فیلد نرخ سفارشی
         function resetRate() {
             document.getElementById('customRateInput').value = '';
             calculate();
         }
 
-        // تابع کمکی برای فرمت کردن اعداد (اضافه کردن جداکننده هزارگان)
         function formatNumber(num) {
             if (isNaN(num)) return '۰';
             return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        // اجرای اولیه هنگام بارگذاری صفحه
         document.addEventListener('DOMContentLoaded', () => {
             calculate(); 
         });
