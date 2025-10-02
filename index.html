@@ -142,9 +142,32 @@
                             <option value="USD">🇺🇸 دلار آمریکا</option>
                             <option value="EUR">🇪🇺 یورو</option>
                             <option value="GBP">🇬🇧 پوند بریتانیا</option>
-                            <option value="AED">🇦🇪 درهم امارات</option>
+                            <option value="CHF">🇨🇭 فرانک سوئیس</option>
+                            <option value="CAD">🇨🇦 دلار کانادا</option>
+                            <option value="AUD">🇦🇺 دلار استرالیا</option>
+                            <option value="SEK">🇸🇪 کرون سوئد</option>
+                            <option value="NOK">🇳🇴 کرون نروژ</option>
+                            <option value="RUB">🇷🇺 روبل روسیه</option>
+                            <option value="THB">🇹🇭 بات تایلند</option>
+                            <option value="SGD">🇸🇬 دلار سنگاپور</option>
+                            <option value="HKD">🇭🇰 هنگ کنگ</option>
                             <option value="AZN">🇦🇿 منات آذربایجان</option>
-                            <option value="IRR" selected>🇮🇷 تومان/ریال</option>
+                            <option value="AMD">🇦🇲 درام ارمنستان</option>
+                            <option value="DKK">🇩🇰 کرون دانمارک</option>
+                            <option value="AED">🇦🇪 درهم امارات</option>
+                            <option value="JPY">🇯🇵 ین ژاپن</option>
+                            <option value="TRY">🇹🇷 لیره ترکیه</option>
+                            <option value="CNY">🇨🇳 یوان چین</option>
+                            <option value="SAR">🇸🇦 ریال عربستان سعودی</option>
+                            <option value="INR">🇮🇳 روپیه هند</option>
+                            <option value="MYR">🇲🇾 رینگیت مالزی</option>
+                            <option value="AFN">🇦🇫 افغانی</option>
+                            <option value="KWD">🇰🇼 دینار کویت</option>
+                            <option value="IQD">🇮🇶 دینار عراق</option>
+                            <option value="BHD">🇧🇭 دینار بحرین</option>
+                            <option value="OMR">🇴🇲 ریال عمان</option>
+                            <option value="QAR">🇶🇦 ریال قطر</option>
+                            <option value="IRR">🇮🇷 تومان/ریال</option>
                         </select>
                         <i class="fa-solid fa-chevron-down absolute left-3 top-1/2 mt-3 text-gray-400 pointer-events-none"></i>
                     </div>
@@ -168,11 +191,34 @@
                         <label for="outputCurrency" class="block text-sm font-medium mb-2" id="outputUnitLabelFixed">انتخاب واحد</label>
                         <select id="outputCurrency" onchange="switchCurrency(true)" class="w-full p-3 border rounded-lg text-lg appearance-none">
                             <option value="IRR">🇮🇷 تومان/ریال</option>
-                            <option value="USD" selected>🇺🇸 دلار آمریکا</option>
+                            <option value="USD">🇺🇸 دلار آمریکا</option>
                             <option value="EUR">🇪🇺 یورو</option>
                             <option value="GBP">🇬🇧 پوند بریتانیا</option>
-                            <option value="AED">🇦🇪 درهم امارات</option>
+                            <option value="CHF">🇨🇭 فرانک سوئیس</option>
+                            <option value="CAD">🇨🇦 دلار کانادا</option>
+                            <option value="AUD">🇦🇺 دلار استرالیا</option>
+                            <option value="SEK">🇸🇪 کرون سوئد</option>
+                            <option value="NOK">🇳🇴 کرون نروژ</option>
+                            <option value="RUB">🇷🇺 روبل روسیه</option>
+                            <option value="THB">🇹🇭 بات تایلند</option>
+                            <option value="SGD">🇸🇬 دلار سنگاپور</option>
+                            <option value="HKD">🇭🇰 هنگ کنگ</option>
                             <option value="AZN">🇦🇿 منات آذربایجان</option>
+                            <option value="AMD">🇦🇲 درام ارمنستان</option>
+                            <option value="DKK">🇩🇰 کرون دانمارک</option>
+                            <option value="AED">🇦🇪 درهم امارات</option>
+                            <option value="JPY">🇯🇵 ین ژاپن</option>
+                            <option value="TRY">🇹🇷 لیره ترکیه</option>
+                            <option value="CNY">🇨🇳 یوان چین</option>
+                            <option value="SAR">🇸🇦 ریال عربستان سعودی</option>
+                            <option value="INR">🇮🇳 روپیه هند</option>
+                            <option value="MYR">🇲🇾 رینگیت مالزی</option>
+                            <option value="AFN">🇦🇫 افغانی</option>
+                            <option value="KWD">🇰🇼 دینار کویت</option>
+                            <option value="IQD">🇮🇶 دینار عراق</option>
+                            <option value="BHD">🇧🇭 دینار بحرین</option>
+                            <option value="OMR">🇴🇲 ریال عمان</option>
+                            <option value="QAR">🇶🇦 ریال قطر</option>
                         </select>
                         <i class="fa-solid fa-chevron-down absolute left-3 top-1/2 mt-3 text-gray-400 pointer-events-none"></i>
                     </div>
@@ -229,13 +275,42 @@
         // ۱. داده‌های اصلی نرخ ارز 
         // **********************************************
         const exchangeData = {
-            updateDate: "۱۰ مهر ۱۴۰۴",
+            // توجه: نرخ‌های جدید بر اساس نرخ تقریبی بازار آزاد در تاریخ امروز (۱۰ مهر ۱۴۰۴) وارد شده‌اند و باید به صورت دستی بروزرسانی شوند.
+            updateDate: "۱۰ مهر ۱۴۰۴ (نرخ‌ها تقریبی هستند)",
             rates: {
+                // نرخ‌های اصلی (از قبل)
                 "USD": { rate: 117860, name: "دلار آمریکا", unit: "$" }, 
                 "EUR": { rate: 138410, name: "یورو", unit: "€" }, 
                 "GBP": { rate: 159250, name: "پوند بریتانیا", unit: "£" },
                 "AED": { rate: 32111, name: "درهم امارات", unit: "د.ا." }, 
-                "AZN": { rate: 69300, name: "منات آذربایجان", unit: "₼" },
+                "AZN": { rate: 69300, name: "منات آذربایجان", unit: "₼" }, 
+
+                // نرخ‌های اضافه شده جدید
+                "CHF": { rate: 131000, name: "فرانک سوئیس", unit: "Fr" },
+                "CAD": { rate: 86000, name: "دلار کانادا", unit: "C$" },
+                "AUD": { rate: 79000, name: "دلار استرالیا", unit: "A$" },
+                "SEK": { rate: 12000, name: "کرون سوئد", unit: "kr" },
+                "NOK": { rate: 10000, name: "کرون نروژ", unit: "kr" },
+                "RUB": { rate: 1300, name: "روبل روسیه", unit: "₽" },
+                "THB": { rate: 3200, name: "بات تایلند", unit: "฿" },
+                "SGD": { rate: 87000, name: "دلار سنگاپور", unit: "S$" },
+                "HKD": { rate: 15000, name: "دلار هنگ کنگ", unit: "HK$" },
+                "AMD": { rate: 240, name: "درام ارمنستان", unit: "֏" },
+                "DKK": { rate: 18500, name: "کرون دانمارک", unit: "kr" },
+                "JPY": { rate: 780, name: "ین ژاپن", unit: "¥" }, // (نرخ هر ۱ ین)
+                "TRY": { rate: 2830, name: "لیره ترکیه", unit: "₺" },
+                "CNY": { rate: 16500, name: "یوان چین", unit: "¥" },
+                "SAR": { rate: 30800, name: "ریال عربستان سعودی", unit: "ر.س" },
+                "INR": { rate: 1500, name: "روپیه هند", unit: "₹" },
+                "MYR": { rate: 24000, name: "رینگیت مالزی", unit: "RM" },
+                "AFN": { rate: 1550, name: "افغانی", unit: "؋" },
+                "KWD": { rate: 390000, name: "دینار کویت", unit: "د.ک" },
+                "IQD": { rate: 90, name: "دینار عراق", unit: "ع.د" },
+                "BHD": { rate: 311000, name: "دینار بحرین", unit: "د.ب" },
+                "OMR": { rate: 303000, name: "ریال عمان", unit: "ر.ع" },
+                "QAR": { rate: 31500, name: "ریال قطر", unit: "ر.ق" },
+
+                // واحد پول پایه
                 "IRR": { rate: 1, name: "تومان", unit: "تومان" } 
             }
         };
@@ -281,6 +356,8 @@
             let rateOutputToBase = exchangeData.rates[outputCode].rate;
             
             let currentRate = rateInputToBase; 
+            
+            // اگر نرخی در بخش سفارشی وارد شده و در حال تبدیل ارز به تومان یا بالعکس هستیم، نرخ سفارشی را اعمال کن
             if (elements.customRateInput.value && !isNaN(parseFloat(elements.customRateInput.value))) {
                 currentRate = parseFloat(elements.customRateInput.value);
             }
@@ -308,10 +385,13 @@
             let resultAmount;
             
             if (inputCode === 'IRR') { 
+                // تبدیل از تومان به ارز خارجی (استفاده از نرخ پایه خروجی)
                 resultAmount = amount / rateOutputToBase; 
             } else if (outputCode === 'IRR') { 
+                // تبدیل از ارز خارجی به تومان (استفاده از نرخ ورودی یا سفارشی)
                 resultAmount = amount * currentRate;
             } else { 
+                // تبدیل ارز خارجی به ارز خارجی (از طریق تومان)
                 const amountInToman = amount * currentRate;
                 resultAmount = amountInToman / rateOutputToBase;
             }
@@ -327,14 +407,22 @@
         function formatNumber(num, decimalPlaces = 0) {
             if (isNaN(num)) return '۰';
             
-            const formatted = num.toFixed(decimalPlaces);
+            // تبدیل عدد به رشته با اعشار مشخص
+            let formatted = num.toFixed(decimalPlaces);
             
+            // جداسازی قسمت صحیح و اعشاری
             const parts = formatted.split('.');
+            
+            // افزودن جداکننده هزارگان به قسمت صحیح
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            return parts.join('/').replace(/(\d)/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+            
+            // تبدیل اعداد انگلیسی به فارسی (۰۱۲۳۴۵۶۷۸۹) و اتصال مجدد
+            formatted = parts.join('.'); // استفاده از نقطه برای جداکننده اعشار در نمایش نهایی
+            return formatted.replace(/(\d)/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // تنظیم مقادیر پیش‌فرض
             elements.inputCurrency.value = 'USD'; 
             elements.outputCurrency.value = 'IRR'; 
             calculate(); 
