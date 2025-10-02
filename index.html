@@ -16,27 +16,30 @@
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #eef2ff; /* پس زمینه کلی روشن و ملایم */
-            color: #1f2937; /* متن اصلی تیره */
+            /* پس زمینه کلی خنثی برای تمرکز روی کارت */
+            background-color: #f7f9fb; 
+            color: #1f2937;
             direction: rtl;
         }
         .card {
-            /* تغییر اصلی: رنگ پس زمینه کارت به فیروزه‌ای خیلی روشن */
+            /* پس زمینه کارت اصلی: فیروزه‌ای روشن برای زیبایی */
             background-color: #E0F7FA; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
-            border: 1px solid #B2EBF2; /* حاشیه کمی تیره‌تر از پس‌زمینه */
-            color: #1f2937; /* متن داخل کارت تیره شد */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); 
+            border: 1px solid #B2EBF2; 
+            color: #1f2937; 
         }
         /* استایل اختصاصی برای ورودی‌ها و منوی کشویی */
-        .input-group input, .input-group select {
-            background-color: #ffffff; /* ورودی‌ها سفید بمانند */
-            border: 1px solid #d1d5db;
-            color: #1f2937; /* متن ورودی‌ها تیره */
+        .input-group input, .input-group select, .result-box {
+            /* کادر ورودی/خروجی: سفید خالص با سایه ملایم */
+            background-color: #ffffff; 
+            border: 1px solid #ddd;
+            color: #1f2937; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* سایه ملایم */
             transition: all 0.2s;
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
-            border-color: #00BCD4; /* رنگ فیروزه‌ای اصلی برای فوکوس */
+            border-color: #00BCD4; 
             box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.3);
         }
         /* نمایش نتیجه به صورت چپ‌چین */
@@ -45,45 +48,31 @@
             text-align: right;
             color: #059669; /* سبز برای نتیجه نهایی */
         }
-        .result-box {
-            background-color: #ffffff; /* باکس نتیجه سفید شد */
-            border: 1px solid #d1d5db;
+        /* بخش اعلان نرخ */
+        .notification-box {
+            /* باکس اعلان نرخ: سفید با حاشیه فیروزه‌ای */
+            background-color: #ffffff; 
+            border-color: #00BCD4; 
+            color: #1f2937; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
-        .switch-button {
-            transition: transform 0.3s ease;
-            background-color: #00BCD4; /* دکمه سوئیچ فیروزه‌ای ماند */
+        .notification-box .fa-bell, .notification-box span {
+            color: #00BCD4; /* آیکون و نرخ اصلی فیروزه‌ای */
+        }
+        /* دکمه‌ها و آیکون‌های تاکیدی */
+        .switch-button, .card header i {
+            background-color: #00BCD4; /* فیروزه‌ای اصلی */
             color: white;
         }
         .switch-button:hover {
-            transform: scale(1.05);
             background-color: #00838F;
         }
-        /* تنظیم رنگ‌های متن در قسمت‌های مختلف کارت برای خوانایی */
-        .card h1, .card p, .card label, .card .text-gray-700 {
-            color: #1f2937 !important; 
-        }
-        /* بخش اعلان نرخ */
-        .notification-box {
-            background-color: #ffffff; /* پس زمینه روشن برای اعلان نرخ */
-            border-color: #00BCD4; /* حاشیه همرنگ اصلی */
-            color: #1f2937; /* متن اعلان تیره */
-        }
-        .notification-box .fa-bell, .notification-box span {
-            color: #00BCD4; /* آیکون و نرخ اصلی فیروزه‌ای شد */
-        }
-        .notification-box .text-gray-500 {
-            color: #6b7280 !important; /* تاریخ بروزرسانی خاکستری متوسط */
-        }
-        /* رنگ آیکون بالای عنوان */
-        .card header i {
-            color: #00BCD4;
-        }
-        /* رنگ دکمه بازنشانی */
         .card button.mt-3 {
              color: #00BCD4 !important;
         }
-        .border-gray-400 {
-             border-color: #d1d5db !important;
+        /* تنظیمات خوانایی متن */
+        .card h1, .card label, .card .font-bold {
+            color: #1f2937 !important; 
         }
     </style>
 </head>
@@ -96,7 +85,7 @@
             <p class="text-gray-500 mt-2">تبدیل دوطرفه ارزهای اصلی بر اساس نرخ روز بازار</p>
         </header>
 
-        <div class="notification-box border-r-4 p-4 mb-8 rounded-lg shadow-md">
+        <div class="notification-box border-r-4 p-4 mb-8 rounded-lg">
             <div class="flex items-center">
                 <i class="fa-solid fa-bell ml-2"></i>
                 <span class="font-bold" id="baseCurrencyName"></span> 
@@ -154,7 +143,7 @@
             </div>
         </div>
         
-        <div class="border-t pt-4">
+        <div class="border-t pt-4 border-gray-300">
             <label for="customRateInput" class="block text-sm font-medium mb-2">نرخ سفارشی (برای محاسبات دلخواه)</label>
             <div class="relative">
                 <input type="number" id="customRateInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="نرخ دلخواه را وارد کنید">
