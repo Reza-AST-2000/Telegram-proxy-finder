@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ماشین حساب تبدیل چند ارزی | روشن و پویا</title>
+    <title>ماشین حساب تبدیل چند ارزی | نهایی</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -16,18 +16,15 @@
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            /* پس زمینه روشن جدید */
-            background-color: #eef2ff; /* رنگ آبی کم‌رنگ */
-            color: #1f2937; /* متن تیره */
+            background-color: #eef2ff; /* پس زمینه روشن و ملایم */
+            color: #1f2937;
             direction: rtl;
         }
         .card {
-            /* کارت سفید با سایه ملایم */
             background-color: #ffffff;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             border: 1px solid #ddd;
         }
-        /* استایل اختصاصی برای ورودی‌ها و منوی کشویی */
         .input-group input, .input-group select {
             background-color: #f9fafb;
             border: 1px solid #d1d5db;
@@ -36,22 +33,29 @@
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
-            border-color: #4f46e5; /* رنگ آبی پررنگ جذاب */
+            border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
         }
         /* نمایش نتیجه تومان به صورت چپ‌چین */
         #tomanOutput {
             direction: ltr; 
             text-align: right;
-            color: #059669; /* سبز زمردی */
+            color: #059669; 
         }
         .result-box {
-            background-color: #f0f4f8; /* خاکستری روشن برای خروجی */
+            background-color: #f0f4f8;
             border: 1px solid #d1d5db;
         }
-        /* تنظیم فاصله ایموجی پرچم */
-        .flag-spacing {
+        /* اصلاح ایراد اصلی: اطمینان از قرارگیری پرچم و متن در یک خط */
+        .rate-display-box {
+             display: flex;
+             align-items: center;
+             flex-wrap: wrap; /* اجازه شکستن خط در موبایل */
+        }
+        .flag-icon {
             margin-left: 8px;
+            font-size: 1.5rem; /* بزرگتر شدن پرچم */
+            line-height: 1;
         }
     </style>
 </head>
@@ -65,11 +69,11 @@
         </header>
 
         <div class="bg-indigo-50 border-r-4 border-indigo-600 p-4 mb-8 rounded-lg text-gray-700 shadow-md">
-            <span class="font-bold flex items-center">
+            <div class="rate-display-box">
                 <i class="fa-solid fa-bell text-indigo-600 ml-2"></i>
-                <span id="flagIcon" class="flag-spacing"></span> <span id="currentCurrencyName">نرخ ارز:</span> 
-            </span>
-            <span id="baseRateDisplay" class="font-extrabold text-xl text-indigo-800 block mt-1"></span> تومان
+                <span id="flagIcon" class="flag-icon"></span> <span class="font-bold" id="currentCurrencyName">نرخ ارز:</span> 
+            </div>
+            <span id="baseRateDisplay" class="font-extrabold text-2xl text-indigo-800 block mt-2"></span> تومان
             <p class="text-xs mt-1 text-gray-500" id="updateInfo"></p>
         </div>
 
@@ -115,7 +119,6 @@
     <script>
         // **********************************************
         // ۱. داده‌های اصلی نرخ ارز (به‌روز شده در ۱۰ مهر ۱۴۰۴)
-        // نرخ‌ها و پرچم‌ها در این بخش به روز شده‌اند
         // **********************************************
         const exchangeData = {
             updateDate: "۱۰ مهر ۱۴۰۴",
@@ -140,7 +143,7 @@
             const baseRateData = exchangeData.rates[selectedCurrency];
             const baseRate = baseRateData ? baseRateData.rate : 0;
             const currencyName = baseRateData ? baseRateData.name : 'ارز';
-            const currencyFlag = baseRateData ? baseRateData.flag : ''; // پرچم جدید
+            const currencyFlag = baseRateData ? baseRateData.flag : ''; 
 
             let rate = baseRate;
             if (customRateInput && !isNaN(parseFloat(customRateInput))) {
@@ -150,10 +153,10 @@
             const amount = parseFloat(amountInput) || 0;
             const tomanAmount = amount * rate;
 
-            // ۳. نمایش نرخ پایه و اطلاعات (به همراه پرچم)
-            document.getElementById('flagIcon').textContent = currencyFlag; // نمایش پرچم
+            // ۳. نمایش نرخ پایه و اطلاعات (اصلاح شده)
+            document.getElementById('flagIcon').textContent = currencyFlag; 
             document.getElementById('currentCurrencyName').textContent = `نرخ ${currencyName} آزاد:`;
-            document.getElementById('baseRateDisplay').textContent = formatNumber(baseRate);
+            document.getElementById('baseRateDisplay').textContent = formatNumber(rate); // از rate استفاده شد تا نرخ سفارشی را هم نمایش دهد
             document.getElementById('updateInfo').textContent = `بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
 
             // ۴. نمایش نتیجه تبدیل شده
@@ -168,3 +171,12 @@
         function formatNumber(num) {
             if (isNaN(num)) return '۰';
             return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            calculate(); 
+        });
+
+    </script>
+</body>
+</html>
