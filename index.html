@@ -21,11 +21,11 @@
             direction: rtl;
         }
         .card {
-            /* این قسمت تغییر کرده است: پس زمینه کارت اصلی */
-            background-color: #00BCD4; /* رنگ آبی فیروزه‌ای از تصویر */
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25); /* سایه کمی قوی‌تر */
-            border: 1px solid #0097A7; /* حاشیه کمی تیره‌تر */
-            color: #f0f0f0; /* رنگ متن داخل کارت برای خوانایی بهتر */
+            /* تغییر اصلی: رنگ پس زمینه کارت به فیروزه‌ای خیلی روشن */
+            background-color: #E0F7FA; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
+            border: 1px solid #B2EBF2; /* حاشیه کمی تیره‌تر از پس‌زمینه */
+            color: #1f2937; /* متن داخل کارت تیره شد */
         }
         /* استایل اختصاصی برای ورودی‌ها و منوی کشویی */
         .input-group input, .input-group select {
@@ -36,8 +36,8 @@
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+            border-color: #00BCD4; /* رنگ فیروزه‌ای اصلی برای فوکوس */
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.3);
         }
         /* نمایش نتیجه به صورت چپ‌چین */
         #outputAmount {
@@ -46,35 +46,44 @@
             color: #059669; /* سبز برای نتیجه نهایی */
         }
         .result-box {
-            background-color: #e0f7fa; /* پس‌زمینه روشن برای باکس نتیجه */
-            border: 1px solid #00BCD4; /* حاشیه همرنگ کارت */
+            background-color: #ffffff; /* باکس نتیجه سفید شد */
+            border: 1px solid #d1d5db;
         }
         .switch-button {
             transition: transform 0.3s ease;
-            background-color: #00838F; /* رنگ کمی تیره‌تر از کارت */
+            background-color: #00BCD4; /* دکمه سوئیچ فیروزه‌ای ماند */
+            color: white;
         }
         .switch-button:hover {
             transform: scale(1.05);
-            background-color: #0097A7;
+            background-color: #00838F;
         }
-        /* تنظیم رنگ‌های متن در قسمت‌های مختلف کارت */
-        .card h1, .card p, .card label {
-            color: #ffffff; /* عنوان‌ها و لیبل‌ها سفید شوند */
-        }
-        .card .text-gray-500 {
-             color: #e0e0e0; /* متن توضیحات کمی روشن‌تر */
-        }
-        .card .text-gray-700 {
-             color: #f0f0f0; /* لیبل‌ها و متن‌های مشابه سفید شوند */
+        /* تنظیم رنگ‌های متن در قسمت‌های مختلف کارت برای خوانایی */
+        .card h1, .card p, .card label, .card .text-gray-700 {
+            color: #1f2937 !important; 
         }
         /* بخش اعلان نرخ */
         .notification-box {
-            background-color: #e0f7fa; /* پس زمینه روشن برای اعلان نرخ */
-            border-color: #00BCD4; /* حاشیه همرنگ کارت */
+            background-color: #ffffff; /* پس زمینه روشن برای اعلان نرخ */
+            border-color: #00BCD4; /* حاشیه همرنگ اصلی */
             color: #1f2937; /* متن اعلان تیره */
         }
-        .notification-box .fa-bell, .notification-box .text-indigo-800 {
-            color: #00BCD4; /* آیکون و نرخ اصلی همرنگ کارت */
+        .notification-box .fa-bell, .notification-box span {
+            color: #00BCD4; /* آیکون و نرخ اصلی فیروزه‌ای شد */
+        }
+        .notification-box .text-gray-500 {
+            color: #6b7280 !important; /* تاریخ بروزرسانی خاکستری متوسط */
+        }
+        /* رنگ آیکون بالای عنوان */
+        .card header i {
+            color: #00BCD4;
+        }
+        /* رنگ دکمه بازنشانی */
+        .card button.mt-3 {
+             color: #00BCD4 !important;
+        }
+        .border-gray-400 {
+             border-color: #d1d5db !important;
         }
     </style>
 </head>
@@ -82,7 +91,7 @@
 
     <div class="w-full max-w-lg mt-10 card p-6 md:p-10 rounded-2xl">
         <header class="text-center mb-8">
-            <i class="fa-solid fa-arrow-right-arrow-left text-4xl text-white mb-3"></i>
+            <i class="fa-solid fa-arrow-right-arrow-left text-4xl mb-3"></i>
             <h1 class="text-3xl font-extrabold">مبدل تبدیل ارز</h1>
             <p class="text-gray-500 mt-2">تبدیل دوطرفه ارزهای اصلی بر اساس نرخ روز بازار</p>
         </header>
@@ -117,7 +126,7 @@
             </div>
 
             <div class="flex justify-center my-3">
-                <button onclick="swapCurrencies()" class="switch-button p-2 text-white rounded-full shadow-lg">
+                <button onclick="swapCurrencies()" class="switch-button p-2 rounded-full shadow-lg">
                     <i class="fa-solid fa-arrows-up-down"></i>
                 </button>
             </div>
@@ -145,20 +154,20 @@
             </div>
         </div>
         
-        <div class="border-t border-gray-400 pt-4">
+        <div class="border-t pt-4">
             <label for="customRateInput" class="block text-sm font-medium mb-2">نرخ سفارشی (برای محاسبات دلخواه)</label>
             <div class="relative">
                 <input type="number" id="customRateInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="نرخ دلخواه را وارد کنید">
                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">تومان</span>
             </div>
-            <button onclick="resetRate()" class="mt-3 text-sm text-white hover:text-gray-200 font-medium transition">بازنشانی به نرخ پایه بازار</button>
+            <button onclick="resetRate()" class="mt-3 text-sm font-medium transition">بازنشانی به نرخ پایه بازار</button>
         </div>
         
     </div>
 
     <script>
         // **********************************************
-        // ۱. داده‌های اصلی نرخ ارز (به‌روز شده در ۱۰ مهر ۱۴۰۴)
+        // ۱. داده‌های اصلی نرخ ارز 
         // **********************************************
         const exchangeData = {
             updateDate: "۱۰ مهر ۱۴۰۴",
@@ -212,22 +221,19 @@
             let rateInputToBase = exchangeData.rates[inputCode].rate;
             let rateOutputToBase = exchangeData.rates[outputCode].rate;
             
-            let currentRate = rateInputToBase; // نرخ فعلی ارز ورودی
+            let currentRate = rateInputToBase; 
             if (elements.customRateInput.value && !isNaN(parseFloat(elements.customRateInput.value))) {
                 currentRate = parseFloat(elements.customRateInput.value);
             }
             
             // نمایش نرخ پایه در اعلان بالا
-            if (inputCode === 'IRR' && outputCode !== 'IRR') {
-                 // تبدیل از تومان به ارز دیگر: نرخ ارز خروجی به تومان را نمایش بده
+            if (inputCode === 'IRR' && outputCode !== 'IRR') { 
                  elements.baseRateDisplay.textContent = formatNumber(rateOutputToBase);
                  elements.baseCurrencyName.textContent = `نرخ ${exchangeData.rates[outputCode].name} آزاد:`;
-            } else if (inputCode !== 'IRR') {
-                 // تبدیل از ارز به تومان یا ارز دیگر: نرخ ارز ورودی به تومان را نمایش بده
+            } else if (inputCode !== 'IRR') { 
                  elements.baseRateDisplay.textContent = formatNumber(currentRate);
                  elements.baseCurrencyName.textContent = `نرخ ${exchangeData.rates[inputCode].name} آزاد:`;
-            } else {
-                 // هر دو تومان هستند یا یک مورد IRR و دیگری IRR است (نباید اتفاق بیفتد)
+            } else { 
                  elements.baseRateDisplay.textContent = '---';
                  elements.baseCurrencyName.textContent = 'نرخ';
             }
@@ -241,11 +247,11 @@
             // انجام محاسبات
             let resultAmount;
             
-            if (inputCode === 'IRR') { // تبدیل از تومان به ارز دیگر
+            if (inputCode === 'IRR') { 
                 resultAmount = amount / rateOutputToBase; 
-            } else if (outputCode === 'IRR') { // تبدیل از ارز دیگر به تومان
+            } else if (outputCode === 'IRR') { 
                 resultAmount = amount * currentRate;
-            } else { // تبدیل بین دو ارز (مثلاً دلار به یورو)
+            } else { 
                 const amountInToman = amount * currentRate;
                 resultAmount = amountInToman / rateOutputToBase;
             }
@@ -261,18 +267,16 @@
         function formatNumber(num, decimalPlaces = 0) {
             if (isNaN(num)) return '۰';
             
-            // برای نمایش اعشار در ارزها
             const formatted = num.toFixed(decimalPlaces);
             
-            // جداکننده هزارگان و اعشار فارسی
             const parts = formatted.split('.');
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             return parts.join('/').replace(/(\d)/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            elements.inputCurrency.value = 'USD'; // پیش‌فرض اولیه
-            elements.outputCurrency.value = 'IRR'; // پیش‌فرض اولیه
+            elements.inputCurrency.value = 'USD'; 
+            elements.outputCurrency.value = 'IRR'; 
             calculate(); 
         });
 
