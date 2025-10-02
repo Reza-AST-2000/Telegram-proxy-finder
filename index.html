@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مبدل تبدیل ارز</title>
+    <title>مبدل تبدیل ارز | تم تیره</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -16,63 +16,68 @@
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            /* پس زمینه کلی خنثی برای تمرکز روی کارت */
-            background-color: #f7f9fb; 
+            /* تغییر: پس زمینه اصلی مشکی */
+            background-color: #1a1a1a; 
             color: #1f2937;
             direction: rtl;
         }
         .card {
-            /* پس زمینه کارت اصلی: فیروزه‌ای روشن برای زیبایی */
-            background-color: #E0F7FA; 
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); 
-            border: 1px solid #B2EBF2; 
+            /* تغییر: کارت اصلی سفید */
+            background-color: #ffffff; 
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); /* سایه قوی‌تر مشکی */
+            border: 2px solid #000000; /* حاشیه مشکی پررنگ برای تمایز */
             color: #1f2937; 
         }
         /* استایل اختصاصی برای ورودی‌ها و منوی کشویی */
         .input-group input, .input-group select, .result-box {
-            /* کادر ورودی/خروجی: سفید خالص با سایه ملایم */
+            /* تغییر: المان‌های داخلی سفید با قاب مشکی */
             background-color: #ffffff; 
-            border: 1px solid #ddd;
+            border: 2px solid #000000; 
             color: #1f2937; 
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* سایه ملایم */
+            box-shadow: 4px 4px 0 #000000; /* سایه مشکی برای برجستگی (اثر کارتونی) */
             transition: all 0.2s;
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
-            border-color: #00BCD4; 
-            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.3);
+            border-color: #000000; 
+            box-shadow: 4px 4px 0 #000000, 0 0 0 3px rgba(0, 0, 0, 0.2);
         }
         /* نمایش نتیجه به صورت چپ‌چین */
         #outputAmount {
             direction: ltr; 
             text-align: right;
-            color: #059669; /* سبز برای نتیجه نهایی */
+            color: #059669; /* رنگ سبز برای نتیجه نهایی */
         }
         /* بخش اعلان نرخ */
         .notification-box {
-            /* باکس اعلان نرخ: سفید با حاشیه فیروزه‌ای */
+            /* باکس اعلان نرخ: سفید با حاشیه مشکی پررنگ */
             background-color: #ffffff; 
-            border-color: #00BCD4; 
+            border-color: #000000; 
+            border-right-width: 4px;
             color: #1f2937; 
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .notification-box .fa-bell, .notification-box span {
-            color: #00BCD4; /* آیکون و نرخ اصلی فیروزه‌ای */
+            /* استفاده از رنگ مشکی برای آیکون و نرخ */
+            color: #000000; 
         }
-        /* دکمه‌ها و آیکون‌های تاکیدی */
-        .switch-button, .card header i {
-            background-color: #00BCD4; /* فیروزه‌ای اصلی */
+        /* دکمه سوئیچ */
+        .switch-button {
+            transition: transform 0.3s ease;
+            background-color: #000000; /* دکمه مشکی */
             color: white;
+            box-shadow: 2px 2px 0 #ffffff; /* سایه سفید کوچک برای برجستگی روی مشکی */
         }
         .switch-button:hover {
-            background-color: #00838F;
+            transform: scale(1.05);
+            background-color: #333333;
         }
+        /* رنگ دکمه بازنشانی */
         .card button.mt-3 {
-             color: #00BCD4 !important;
+             color: #000000 !important; /* متن دکمه مشکی */
         }
-        /* تنظیمات خوانایی متن */
-        .card h1, .card label, .card .font-bold {
-            color: #1f2937 !important; 
+        .border-gray-300 {
+             border-color: #cccccc !important;
         }
     </style>
 </head>
@@ -80,9 +85,9 @@
 
     <div class="w-full max-w-lg mt-10 card p-6 md:p-10 rounded-2xl">
         <header class="text-center mb-8">
-            <i class="fa-solid fa-arrow-right-arrow-left text-4xl mb-3"></i>
-            <h1 class="text-3xl font-extrabold">مبدل تبدیل ارز</h1>
-            <p class="text-gray-500 mt-2">تبدیل دوطرفه ارزهای اصلی بر اساس نرخ روز بازار</p>
+            <i class="fa-solid fa-arrow-right-arrow-left text-4xl mb-3" style="color:#000000;"></i>
+            <h1 class="text-3xl font-extrabold" style="color:#000000;">مبدل تبدیل ارز</h1>
+            <p class="text-gray-500 mt-2" style="color:#333333 !important;">تبدیل دوطرفه ارزهای اصلی بر اساس نرخ روز بازار</p>
         </header>
 
         <div class="notification-box border-r-4 p-4 mb-8 rounded-lg">
@@ -125,7 +130,7 @@
                     <label for="outputAmount" class="block text-sm font-medium mb-2" id="outputLabel">معادل تومان</label>
                     <div class="relative result-box p-4 rounded-lg shadow-inner">
                         <p id="outputAmount" class="text-4xl font-extrabold">۰</p>
-                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold" id="outputUnitDisplay">تومان</span>
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">تومان</span>
                     </div>
                 </div>
                 <div class="w-2/5 relative">
