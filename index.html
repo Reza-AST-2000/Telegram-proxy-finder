@@ -16,55 +16,43 @@
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            /* پس زمینه کلی صفحه: خاکستری بسیار روشن */
             background-color: #f0f0f0; 
             color: #1f2937;
             direction: rtl;
         }
         .card {
-            /* تغییر اصلی: پس زمینه کارت اصلی سفید شد */
             background-color: #ffffff; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* سایه ملایم */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
             border: 1px solid #e0e0e0; 
             color: #1f2937; 
         }
         
-        /* استایل اختصاصی برای کادرهای ورودی، خروجی و منوی کشویی */
         .input-group input, .input-group select, .result-box, .notification-box {
-            /* این کادرها اکنون تمایز بیشتری پیدا می‌کنند */
             background-color: #ffffff; 
             border: 1px solid #d1d5db;
             color: #1f2937; 
-            /* سایه مشکی ملایم و ضایع‌نبودنی */
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
             transition: all 0.2s;
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
-            border-color: #00BCD4; /* رنگ فیروزه‌ای برای فوکوس حفظ شد */
+            border-color: #00BCD4; 
             box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.3);
         }
         
-        /* نمایش نتیجه به صورت چپ‌چین */
         #outputAmount {
             direction: ltr; 
             text-align: right;
-            color: #059669; /* سبز برای نتیجه نهایی */
+            color: #059669; 
         }
         
-        /* بخش اعلان نرخ */
         .notification-box {
-            /* حفظ حاشیه فیروزه‌ای برای زیبایی */
             border-color: #00BCD4; 
         }
-        .notification-box .fa-bell, .notification-box .font-bold {
-            color: #00BCD4; /* آیکون و نام ارز فیروزه‌ای */
-        }
-        .notification-box #baseRateDisplay {
-            color: #00BCD4; /* نرخ ارز فیروزه‌ای */
+        .notification-box .fa-bell, .notification-box .font-bold, .notification-box #baseRateDisplay {
+            color: #00BCD4; 
         }
         
-        /* دکمه‌ها و آیکون‌های تاکیدی */
         .switch-button, .card header i {
             background-color: #00BCD4; 
             color: white;
@@ -75,7 +63,6 @@
         .card button.mt-3 {
              color: #00BCD4 !important;
         }
-        /* خط جداکننده */
         .border-gray-300 {
             border-color: #d1d5db !important;
         }
@@ -231,7 +218,11 @@
                  elements.baseRateDisplay.textContent = '---';
                  elements.baseCurrencyName.textContent = 'نرخ';
             }
-            elements.updateInfo.textContent = `بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
+            
+            // **********************************************
+            // اصلاح شده: اضافه کردن "آخرین" به عبارت بروزرسانی
+            // **********************************************
+            elements.updateInfo.textContent = `آخرین بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
 
             // تنظیم برچسب‌ها
             elements.inputLabel.textContent = `مقدار ${exchangeData.rates[inputCode].name}`;
