@@ -47,7 +47,7 @@
 
         <div class="bg-blue-50 border-r-4 border-blue-600 p-4 mb-8 rounded-lg text-gray-700">
             <i class="fa-solid fa-bell text-blue-600 ml-2"></i>
-            <span class="font-bold" id="currentCurrencyName">نرخ دلار آزاد:</span> 
+            <span class="font-bold" id="currentCurrencyName">نرخ ارز:</span> 
             <span id="baseRateDisplay" class="font-extrabold text-lg text-blue-800"></span> تومان
             <p class="text-sm mt-1 text-gray-500" id="updateInfo"></p>
         </div>
@@ -62,8 +62,10 @@
                 <select id="currencySelect" onchange="calculate()" class="w-full bg-white p-3 border rounded-lg text-lg appearance-none focus:ring-blue-500">
                     <option value="USD">🇺🇸 دلار آمریکا</option>
                     <option value="EUR">🇪🇺 یورو</option>
+                    <option value="GBP">🇬🇧 پوند بریتانیا</option>
                     <option value="AED">🇦🇪 درهم امارات</option>
-                    </select>
+                    <option value="AZN">🇦🇿 منات آذربایجان</option>
+                </select>
                 <i class="fa-solid fa-chevron-down absolute left-3 top-1/2 mt-3 text-gray-400 pointer-events-none"></i>
             </div>
         </div>
@@ -91,18 +93,17 @@
 
     <script>
         // **********************************************
-        // ۱. داده‌های اصلی نرخ ارز (به‌روز شده در مهر ۱۴۰۴)
+        // ۱. داده‌های اصلی نرخ ارز (به‌روز شده در ۱۰ مهر ۱۴۰۴)
         // **********************************************
         const exchangeData = {
             updateDate: "۱۰ مهر ۱۴۰۴",
-            // نرخ‌های تقریبی بازار آزاد - دقت کنید این نرخ‌ها باید توسط شما به‌روز شوند
+            // نرخ‌های تقریبی بازار آزاد بر اساس آخرین قیمت‌ها
             rates: {
-                // نرخ دلار آزاد (بر اساس آخرین جستجو)
                 "USD": { rate: 117860, name: "دلار آمریکا" }, 
-                // نرخ یورو آزاد 
                 "EUR": { rate: 138410, name: "یورو" }, 
-                // نرخ درهم آزاد 
-                "AED": { rate: 32111, name: "درهم امارات" } 
+                "GBP": { rate: 159250, name: "پوند بریتانیا" }, // نرخ جدید
+                "AED": { rate: 32111, name: "درهم امارات" }, 
+                "AZN": { rate: 69300, name: "منات آذربایجان" }  // نرخ جدید (تخمینی)
             }
         };
 
@@ -117,6 +118,7 @@
             
             // گرفتن نرخ پایه ارز انتخابی از لیست داده‌ها
             const baseRateData = exchangeData.rates[selectedCurrency];
+            // اگر ارزی پیدا نشد، نرخ را صفر در نظر می‌گیرد
             const baseRate = baseRateData ? baseRateData.rate : 0;
             const currencyName = baseRateData ? baseRateData.name : 'ارز';
 
