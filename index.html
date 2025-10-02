@@ -11,13 +11,15 @@
         /* فونت فارسی Vazirmatn */
         @font-face {
             font-family: 'Vazirmatn';
+            /* استفاده از لینک CDN صحیح برای فونت */
             src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
             font-weight: 400;
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #1f2937; /* تغییر پس‌زمینه کلی به رنگ تیره برای هماهنگی با فوتر جدید */
-            color: #f3f4f6;
+            /* تغییر پس‌زمینه کلی به رنگ سفید */
+            background-color: #f3f4f6; 
+            color: #1f2937; /* متن اصلی مشکی */
             direction: rtl;
             display: flex; 
             flex-direction: column;
@@ -30,37 +32,42 @@
             padding: 1.5rem;
         }
         .card {
-            background-color: #2d3748; /* رنگ پس‌زمینه کارت */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
-            border: 1px solid #4a5568; 
-            color: #f3f4f6; 
+            /* تغییر رنگ کارت به سفید یا روشن‌تر */
+            background-color: #ffffff; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+            border: 1px solid #e5e7eb; /* مرز روشن */
+            color: #1f2937; 
         }
         
-        /* اصلاح رنگ‌بندی برای تم تیره */
+        /* اصلاح رنگ‌بندی برای تم روشن */
         .input-group input, .input-group select, .result-box, .notification-box {
-            background-color: #4a5568; 
-            border: 1px solid #718096;
-            color: #f3f4f6; 
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2); 
+            background-color: #f9fafb; /* ورودی‌ها کمی خاکستری روشن */
+            border: 1px solid #d1d5db;
+            color: #1f2937; 
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
             border-color: #00BCD4; 
-            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.4);
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
         }
         
         #outputAmount {
             direction: ltr; 
             text-align: right;
-            color: #68D391; /* رنگ سبز روشن‌تر */
+            color: #10B981; /* رنگ سبز */
         }
         
         .notification-box {
             border-color: #00BCD4; 
-            background-color: #2a3443;
+            background-color: #e0f7fa; /* پس‌زمینه روشن برای اعلان */
+            color: #00BCD4; /* متن اصلی اعلان */
         }
         .notification-box .fa-bell, .notification-box .font-bold, .notification-box #baseRateDisplay {
             color: #00BCD4; 
+        }
+        .notification-box p {
+            color: #4b5563; /* متن توضیحات اعلان خاکستری تیره */
         }
         
         .switch-button, .card header i {
@@ -74,10 +81,30 @@
              color: #00BCD4 !important;
         }
         .border-gray-300 {
-            border-color: #4a5568 !important; /* تغییر رنگ جداکننده */
+            border-color: #e5e7eb !important; /* تغییر رنگ جداکننده به روشن */
         }
-        
-        /* استایل‌های اختصاصی فوتر (برای انیمیشن) */
+
+        /* --- استایل‌های اختصاصی فوتر (برای حفظ رنگ مشکی) --- */
+        .custom-footer {
+             /* حفظ رنگ‌های تیره فوتر */
+            background-color: #1f2937; 
+            color: #f3f4f6; 
+            border-top: 1px solid #4a5568; 
+        }
+        .custom-footer .border-gray-800 {
+             border-color: #4a5568 !important; /* مرزهای داخلی تیره */
+        }
+        .custom-footer .text-slate-400 {
+            color: #94a3b8; /* متن خاکستری روشن */
+        }
+        .custom-footer .text-sky-400 {
+            color: #38bdf8; /* آبی */
+        }
+        .custom-footer .text-green-400 {
+            color: #4ade80; /* سبز */
+        }
+
+        /* استایل‌های انیمیشن */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -92,11 +119,6 @@
             animation: fadeInUp 0.6s ease-out forwards;
             opacity: 0;
         }
-        
-        .footer-link-button {
-            /* استایل‌های لینک در فوتر جدید */
-            color: inherit;
-        }
     </style>
 </head>
 <body class="p-0">
@@ -106,7 +128,7 @@
             <header class="text-center mb-8">
                 <i class="fa-solid fa-arrow-right-arrow-left text-4xl mb-3"></i>
                 <h1 class="text-3xl font-extrabold">مبدل تبدیل ارز</h1>
-                <p class="text-gray-400 mt-2">تبدیل دوطرفه ارزهای اصلی بر اساس نرخ روز بازار</p>
+                <p class="text-gray-500 mt-2">تبدیل دوطرفه ارزهای اصلی بر اساس نرخ روز بازار</p>
             </header>
 
             <div class="notification-box border-r-4 p-4 mb-8 rounded-lg">
@@ -115,7 +137,7 @@
                     <span class="font-bold" id="baseCurrencyName"></span> 
                 </div>
                 <span id="baseRateDisplay" class="font-extrabold text-2xl block mt-2"></span> تومان
-                <p class="text-xs mt-1 text-gray-400" id="updateInfo"></p>
+                <p class="text-xs mt-1" id="updateInfo"></p>
             </div>
 
             <div class="mb-6">
@@ -172,7 +194,7 @@
                         <label for="outputAmount" class="block text-sm font-medium mb-2" id="outputLabel">معادل تومان</label>
                         <div class="relative result-box p-4 rounded-lg shadow-inner">
                             <p id="outputAmount" class="text-4xl font-extrabold">۰</p>
-                            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold" id="outputUnitDisplay">تومان</span>
+                            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold" id="outputUnitDisplay">تومان</span>
                         </div>
                     </div>
                     <div class="w-2/5 relative">
@@ -217,12 +239,12 @@
                 <label for="customRateInput" class="block text-sm font-medium mb-2">نرخ سفارشی (برای محاسبات دلخواه)</label>
                 <div class="relative">
                     <input type="number" id="customRateInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="نرخ دلخواه را وارد کنید">
-                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-bold">تومان</span>
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">تومان</span>
                 </div>
                 <button onclick="resetRate()" class="mt-3 text-sm font-medium transition">بازنشانی به نرخ پایه بازار</button>
             </div>
         </div>
-    </div> <footer class="text-center py-8 mt-12 border-t border-gray-800 text-slate-400 fade-in-up" style="animation-delay: 0.4s;">
+    </div> <footer class="text-center py-8 mt-12 border-t border-gray-800 text-slate-400 fade-in-up custom-footer" style="animation-delay: 0.4s;">
         <div class="container mx-auto px-4">
             <div class="grid md:grid-cols-2 gap-8 items-center">
 
@@ -244,7 +266,7 @@
                         <h4 class="font-bold text-lg">طراح و توسعه دهنده</h4>
                     </div>
                     <p>ساخته شده با <i class="fa-solid fa-heart text-red-500"></i> برای دسترسی آزاد</p>
-                     <a href="https://t.me/asrnovin_ir" target="_blank" rel="noopener noreferrer"
+                    <a href="https://t.me/reza_gh_ni" target="_blank" rel="noopener noreferrer"
                        class="group inline-block mt-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-semibold py-2 px-5 border border-green-500/20 rounded-lg transition-all duration-300">
                         @reza_gh_ni
                         <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70 group-hover:opacity-100 transition-opacity"></i>
