@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تابلوی اعلانات ساده</title>
+    <title>تابلوی اعلانات پیشرفته</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
@@ -20,17 +20,17 @@
             border: 1px solid #e5e7eb;
         }
         .message-card {
-            border-right: 4px solid #F97316; /* رنگ نارنجی برای تاکید */
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-right: 4px solid var(--card-border-color); /* رنگ مرز دینامیک */
         }
         .message-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"], textarea {
+        input[type="text"], textarea, #search-input {
             border-color: #d1d5db;
         }
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus, textarea:focus, #search-input:focus {
             border-color: #F97316;
             box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
             outline: none;
@@ -45,6 +45,17 @@
         .text-orange-600 {
             color: #F97316;
         }
+        /* کلاس‌های رنگی برای کارت‌ها */
+        .color-blue { --card-bg-color: #e0f2fe; --card-border-color: #38bdf8; }
+        .color-green { --card-bg-color: #dcfce7; --card-border-color: #22c55e; }
+        .color-yellow { --card-bg-color: #fef9c3; --card-border-color: #eab308; }
+        .color-red { --card-bg-color: #fee2e2; --card-border-color: #ef4444; }
+        .color-default { --card-bg-color: #ffffff; --card-border-color: #F97316; }
+
+        .message-card {
+            background-color: var(--card-bg-color);
+        }
+
         /* انیمیشن برای ورود پیام‌های جدید */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-10px); }
@@ -60,7 +71,7 @@
     <div class="max-w-4xl mx-auto">
         
         <header class="text-center mb-10">
-            <i class="fa-solid fa-note-sticky text-4xl text-orange-600 mb-3"></i>
+            <i class="fa-solid fa-clipboard-list text-4xl text-orange-600 mb-3"></i>
             <h1 class="text-4xl font-extrabold text-gray-800">تابلوی اعلانات عمومی</h1>
             <p class="text-gray-500 mt-2">پیام خود را ثبت کنید تا همه ببینند! (ذخیره در مرورگر شما)</p>
         </header>
@@ -70,17 +81,27 @@
             <form id="message-form" class="space-y-4">
                 
                 <div>
-                    <label for="message-content" class="block text-sm font-medium text-gray-700">پیام شما</label>
-                    <textarea id="message-content" rows="3" required
+                    <label for="message-content" class="block text-sm font-medium text-gray-700">پیام شما (<span id="char-count">0</span>/250)</label>
+                    <textarea id="message-content" rows="4" maxlength="250" required
                         class="mt-1 block w-full p-3 border rounded-md shadow-sm resize-y"
-                        placeholder="حداکثر ۲۰۰ کاراکتر"></textarea>
+                        placeholder="حداکثر ۲۵۰ کاراکتر"></textarea>
                 </div>
                 
-                <div class="flex space-x-4 space-x-reverse">
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 md:space-x-reverse">
                     <div class="flex-1">
                         <label for="message-author" class="block text-sm font-medium text-gray-700">نام مستعار</label>
                         <input type="text" id="message-author" value="ناشناس" required
                             class="mt-1 block w-full p-3 border rounded-md shadow-sm">
+                    </div>
+                    <div class="flex-1">
+                        <label for="message-color" class="block text-sm font-medium text-gray-700">انتخاب رنگ کارت</label>
+                        <select id="message-color" class="mt-1 block w-full p-3 border rounded-md shadow-sm appearance-none">
+                            <option value="default">پیش‌فرض (نارنجی)</option>
+                            <option value="blue">آبی (اطلاعیه)</option>
+                            <option value="green">سبز (مثبت)</option>
+                            <option value="yellow">زرد (هشدار)</option>
+                            <option value="red">قرمز (مهم)</option>
+                        </select>
                     </div>
                 </div>
 
@@ -93,30 +114,54 @@
         </section>
 
         <section>
-            <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-gray-700">پیام‌های ثبت شده</h2>
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="text-2xl font-bold text-gray-700">پیام‌های ثبت شده</h2>
+                <button onclick="clearAllMessages()" id="clear-messages-btn"
+                        class="text-sm font-medium text-red-600 hover:text-red-800 hidden">
+                    <i class="fa-solid fa-trash-can ml-1"></i> پاک کردن همه
+                </button>
+            </div>
+            
+            <div class="mb-6 relative">
+                 <input type="text" id="search-input" oninput="filterMessages()" 
+                        class="w-full p-3 pr-10 border rounded-lg text-lg" 
+                        placeholder="جستجو بر اساس محتوا یا نام نویسنده...">
+                 <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+            
             <div id="messages-container" class="space-y-4">
                 <p id="no-message-placeholder" class="text-center text-gray-500 mt-8 hidden">
                     <i class="fa-solid fa-inbox text-5xl mb-3"></i><br>
                     هنوز پیامی ثبت نشده است. اولین نفر باشید!
                 </p>
+                <p id="no-result-placeholder" class="text-center text-gray-500 mt-8 hidden">
+                    <i class="fa-solid fa-search-minus text-5xl mb-3"></i><br>
+                    نتیجه‌ای برای جستجوی شما پیدا نشد.
+                </p>
             </div>
             
-             <button onclick="clearAllMessages()" id="clear-messages-btn"
-                    class="mt-6 text-sm font-medium text-red-600 hover:text-red-800 hidden">
-                <i class="fa-solid fa-trash-can ml-1"></i> پاک کردن تمام پیام‌ها
-            </button>
         </section>
 
     </div>
 
     <script>
-        const MESSAGE_KEY = 'simpleMessageBoardMessages';
+        const MESSAGE_KEY = 'advancedMessageBoardMessages';
         const container = document.getElementById('messages-container');
         const form = document.getElementById('message-form');
         const contentInput = document.getElementById('message-content');
         const authorInput = document.getElementById('message-author');
+        const colorSelect = document.getElementById('message-color');
         const placeholder = document.getElementById('no-message-placeholder');
+        const noResultPlaceholder = document.getElementById('no-result-placeholder');
         const clearBtn = document.getElementById('clear-messages-btn');
+        const charCountSpan = document.getElementById('char-count');
+        const searchInput = document.getElementById('search-input');
+        
+        // به‌روزرسانی شمارنده کاراکتر
+        contentInput.addEventListener('input', () => {
+            charCountSpan.textContent = contentInput.value.length;
+        });
+
 
         // تابع کمکی برای فرمت تاریخ
         function formatDate(timestamp) {
@@ -125,25 +170,40 @@
             return date.toLocaleDateString('fa-IR', options);
         }
 
-        // ۱. نمایش پیام‌ها از LocalStorage
-        function loadMessages() {
-            // بازیابی پیام‌ها یا آرایه خالی اگر چیزی وجود ندارد
+        // ۱. نمایش پیام‌ها (بر اساس فیلتر جستجو)
+        function loadMessages(filterText = '') {
             const messages = JSON.parse(localStorage.getItem(MESSAGE_KEY)) || [];
             
-            // مرتب سازی جدیدترین پیام در بالا
+            // مرتب سازی: جدیدترین پیام در بالا
             messages.sort((a, b) => b.timestamp - a.timestamp); 
 
             container.innerHTML = ''; // پاک کردن محتوای قبلی
             
+            let filteredMessages = messages;
+            
+            // اعمال فیلتر جستجو (بدون حساسیت به بزرگی و کوچکی حروف)
+            if (filterText) {
+                const lowerCaseFilter = filterText.toLowerCase();
+                filteredMessages = messages.filter(msg => 
+                    msg.content.toLowerCase().includes(lowerCaseFilter) ||
+                    msg.author.toLowerCase().includes(lowerCaseFilter)
+                );
+            }
+            
+            // مدیریت نمایش متن‌های جایگزین
+            placeholder.classList.add('hidden');
+            noResultPlaceholder.classList.add('hidden');
+            clearBtn.classList.remove('hidden');
+
             if (messages.length === 0) {
                 placeholder.classList.remove('hidden');
                 clearBtn.classList.add('hidden');
-            } else {
-                placeholder.classList.add('hidden');
-                clearBtn.classList.remove('hidden');
+            } else if (filteredMessages.length === 0 && filterText) {
+                 noResultPlaceholder.classList.remove('hidden');
             }
 
-            messages.forEach(msg => {
+
+            filteredMessages.forEach(msg => {
                 const messageElement = createMessageElement(msg);
                 container.appendChild(messageElement);
             });
@@ -152,11 +212,21 @@
         // ۲. ایجاد المان HTML برای یک پیام
         function createMessageElement(msg) {
             const card = document.createElement('div');
-            card.className = 'message-card p-4 rounded-lg card fade-in-down';
+            card.className = `message-card p-4 rounded-lg card fade-in-down color-${msg.color || 'default'}`;
+            card.setAttribute('data-id', msg.id); 
             card.innerHTML = `
-                <p class="text-lg text-gray-800 mb-2 whitespace-pre-wrap">${msg.content}</p>
+                <div class="relative">
+                    <p class="text-lg text-gray-800 mb-2 whitespace-pre-wrap">${msg.content}</p>
+                    
+                    <button onclick="deleteMessage('${msg.id}')" 
+                            class="absolute top-0 left-0 text-gray-400 hover:text-red-500 transition duration-150"
+                            title="حذف پیام">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                </div>
+                
                 <div class="flex justify-between items-center text-sm text-gray-500 mt-3 border-t pt-2">
-                    <span class="font-medium text-orange-600">
+                    <span class="font-medium">
                         <i class="fa-solid fa-user-edit ml-1"></i> ${msg.author}
                     </span>
                     <span class="text-xs">
@@ -173,16 +243,16 @@
 
             const content = contentInput.value.trim();
             const author = authorInput.value.trim() || 'ناشناس';
+            const color = colorSelect.value;
             
-            if (content.length > 200) {
-                alert('پیام نباید بیشتر از ۲۰۰ کاراکتر باشد.');
-                return;
-            }
             if (!content) return; 
-
+            
             const newMessage = {
+                // استفاده از زمان به عنوان یک ID منحصر به فرد
+                id: Date.now().toString(), 
                 content: content,
                 author: author,
+                color: color,
                 timestamp: Date.now() 
             };
 
@@ -190,25 +260,53 @@
             messages.push(newMessage);
             localStorage.setItem(MESSAGE_KEY, JSON.stringify(messages));
 
-            // پاک کردن فرم
+            // پاک کردن فرم و رفرش
             contentInput.value = '';
-            // نمایش مجدد پیام‌ها
-            loadMessages();
+            authorInput.value = 'ناشناس';
+            colorSelect.value = 'default';
+            charCountSpan.textContent = '0';
+            
+            loadMessages(); // نمایش مجدد پیام‌ها
         });
         
-        // ۴. پاک کردن همه پیام ها
+        // ۴. حذف یک پیام خاص
+        function deleteMessage(id) {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید این پیام را حذف کنید؟')) {
+                return;
+            }
+            let messages = JSON.parse(localStorage.getItem(MESSAGE_KEY)) || [];
+            // فیلتر کردن و نگه داشتن پیام‌هایی که IDشان با مورد حذف شده برابر نیست
+            messages = messages.filter(msg => msg.id !== id); 
+            localStorage.setItem(MESSAGE_KEY, JSON.stringify(messages));
+            loadMessages(); // بارگذاری مجدد
+        }
+        // اضافه کردن تابع به پنجره سراسری
+        window.deleteMessage = deleteMessage;
+        
+        // ۵. پاک کردن همه پیام ها
         function clearAllMessages() {
-            if (confirm('آیا مطمئن هستید که می‌خواهید تمام پیام‌ها را پاک کنید؟')) {
+            if (confirm('آیا مطمئن هستید که می‌خواهید تمام پیام‌ها را پاک کنید؟ این عملیات قابل بازگشت نیست.')) {
                 localStorage.removeItem(MESSAGE_KEY);
+                searchInput.value = ''; // پاک کردن جستجو
                 loadMessages(); // بارگذاری مجدد و نمایش صفحه خالی
             }
         }
-        // اضافه کردن تابع به پنجره سراسری برای فراخوانی از دکمه HTML
+        // اضافه کردن تابع به پنجره سراسری
         window.clearAllMessages = clearAllMessages;
-
-
+        
+        // ۶. فیلتر کردن پیام‌ها بر اساس ورودی جستجو
+        function filterMessages() {
+            const filterText = searchInput.value.trim();
+            loadMessages(filterText);
+        }
+        
         // اجرای اولیه برای نمایش پیام‌های موجود هنگام بارگذاری صفحه
-        document.addEventListener('DOMContentLoaded', loadMessages);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMessages();
+            contentInput.value = ''; // مطمئن شدن از پاک بودن هنگام بارگذاری مجدد
+            charCountSpan.textContent = '0';
+        });
+
     </script>
 </body>
 </html>
