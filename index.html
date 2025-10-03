@@ -27,7 +27,7 @@
         }
         .message-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 6px 15px rgba(0, 0, 0, 0.1);
         }
         input, textarea, select {
             border-color: #d1d5db;
@@ -112,9 +112,12 @@
                 
                 <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 md:space-x-reverse">
                     <div class="flex-1">
-                        <label for="message-author" class="block text-sm font-medium text-gray-700">نام مستعار</label>
-                        <input type="text" id="message-author" value="ناشناس" required
-                            class="mt-1 block w-full p-3 border rounded-md shadow-sm">
+                        <!-- تغییرات در فیلد نام مستعار -->
+                        <label for="message-author" class="block text-sm font-medium text-gray-700">نام مستعار (حداکثر ۲۰ کاراکتر)</label>
+                        <input type="text" id="message-author" value="" required maxlength="20"
+                            class="mt-1 block w-full p-3 border rounded-md shadow-sm"
+                            placeholder="نام خود را وارد کنید">
+                        <!-- end changes -->
                     </div>
                     <div class="flex-1">
                         <label for="message-color" class="block text-sm font-medium text-gray-700">انتخاب رنگ کارت</label>
@@ -252,6 +255,11 @@
          */
         async function initializeFirebase() {
             try {
+                // اضافه شدن بررسی وجود تنظیمات Firebase 
+                if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
+                    throw new Error("Firebase configuration is missing or invalid.");
+                }
+
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -273,7 +281,13 @@
             } catch (error) {
                 console.error("Firebase Initialization Error:", error);
                 userInfoSpan.textContent = "خطا در اتصال";
-                showToast("خطا در اتصال به دیتابیس. لطفاً صفحه را رفرش کنید.", 'error');
+                
+                // نمایش پیام خطای دقیق‌تر برای تنظیمات
+                if (error.message.includes("configuration is missing")) {
+                    showToast("خطا: تنظیمات Firebase پیدا نشد. دیتابیس فعال نیست.", 'error');
+                } else {
+                    showToast("خطا در اتصال به دیتابیس. لطفاً صفحه را رفرش کنید.", 'error');
+                }
             }
         }
         
@@ -366,17 +380,30 @@
             }
 
             const content = contentInput.value.trim();
-            const author = authorInput.value.trim() || 'ناشناس';
+            // تغییرات: Trim کردن نام و بررسی خالی بودن آن
+            const author = authorInput.value.trim(); 
             const color = colorSelect.value;
             
-            if (!content) return; 
+            if (!content) {
+                showToast("لطفاً محتوای پیام را وارد کنید.", 'error');
+                return;
+            }
+            
+            // اعمال محدودیت جدید برای نام
+            if (!author) {
+                 showToast("لطفاً نام مستعار خود را وارد کنید.", 'error');
+                 return;
+            } else if (author.length > 20) {
+                 showToast("نام مستعار نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.", 'error');
+                 return;
+            }
             
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin ml-2"></i> در حال ارسال...';
 
             const newMessage = {
                 content: content,
-                author: author,
+                author: author, // استفاده از نام تایید شده
                 color: color,
                 userId: currentUserId, 
                 timestamp: new Date(),
@@ -392,7 +419,7 @@
                 // پاک کردن فرم پس از موفقیت
                 contentInput.value = '';
                 charCountSpan.textContent = '0';
-                authorInput.value = 'ناشناس';
+                authorInput.value = ''; // نام را پاک می‌کنیم تا کاربر مجبور به وارد کردن نام جدید باشد
                 colorSelect.value = 'default';
                 
                 showToast("پیام شما با موفقیت ثبت شد.", 'success');
