@@ -3,690 +3,987 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مرکز پیام‌های فوری (Firestore)</title>
-    <!-- استفاده از CDN برای Tailwind CSS و فونت -->
+    <title>پروکسی یاب تلگرام</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
-    
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="پروکسی یاب">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
     <style>
-        /* تنظیم فونت و جهت‌دهی کلی */
-        body {
+        /* Dark theme variables (default) */
+        :root {
+            --bg-color: #010409;
+            --card-bg-color: #0d1117;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-color: #e6edf3;
+            --text-secondary-color: #7d8590;
+            --accent-color: #2f81f7;
+            --success-color: #238636;
+            --warning-color: #f59e0b;
+            --danger-color: #da3633;
+            --glow-color: rgba(47, 129, 247, 0.7);
+        }
+
+        /* Light theme variables */
+        :root.light-theme {
+            /* Modified for a soft sea blue theme */
+            --bg-color: #eaf7ff;
+            --card-bg-color: #ffffff;
+            --border-color: #a0c0e0;
+            --text-color: #2a3848;
+            --text-secondary-color: #5c6778;
+            --accent-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --glow-color: rgba(0, 123, 255, 0.5);
+        }
+        
+        /* فونت و تنظیمات کلی */
+        * {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #f3f4f6;
-            direction: rtl;
-        }
-        .card {
-            background-color: #ffffff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e5e7eb;
-        }
-        .message-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-right: 4px solid var(--card-border-color); /* رنگ مرز دینامیک */
-        }
-        .message-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 6px 15px rgba(0, 0, 0, 0.1);
-        }
-        input, textarea, select {
-            border-color: #d1d5db;
-        }
-        input:focus, textarea:focus, select:focus {
-            border-color: #F97316;
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
-            outline: none;
-        }
-        .submit-btn {
-            background-color: #F97316;
-            transition: background-color 0.2s;
-        }
-        .submit-btn:hover {
-            background-color: #EA580C;
-        }
-        .text-orange-600 {
-            color: #F97316;
+            box-sizing: border-box;
         }
 
-        /* کلاس‌های رنگی برای کارت‌ها */
-        .color-blue { --card-bg-color: #e0f2fe; --card-border-color: #38bdf8; }
-        .color-green { --card-bg-color: #dcfce7; --card-border-color: #22c55e; }
-        .color-yellow { --card-bg-color: #fef9c3; --card-border-color: #eab308; }
-        .color-red { --card-bg-color: #fee2e2; --card-border-color: #ef4444; }
-        .color-default { --card-bg-color: #ffffff; --card-border-color: #F97316; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-        .message-card {
+        /* چیدمان کارت‌های پروکسی */
+        .proxy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+            gap: 24px;
+        }
+
+        /* استایل کارت‌های پروکسی */
+        .proxy-card {
             background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
         }
 
-        /* انیمیشن برای ورود پیام‌های جدید */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-10px); }
+        .proxy-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background: radial-gradient(
+                600px circle at var(--mouse-x) var(--mouse-y),
+                var(--glow-color),
+                transparent 40%
+            );
+            opacity: 0;
+            transition: opacity 0.4s ease-out;
+            z-index: 0;
+        }
+
+        .proxy-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .proxy-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-color: var(--accent-color);
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* استایل دکمه‌ها */
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+        .btn-primary:hover { background: #1f6feb; box-shadow: 0 0 15px rgba(47, 129, 247, 0.5); }
+        .btn-primary.light-theme:hover { box-shadow: 0 0 15px rgba(0, 123, 255, 0.5); }
+
+        .btn-success { background: var(--success-color); border-color: var(--success-color); color: #fff; }
+        .btn-success:hover { background: #2ea043; box-shadow: 0 0 15px rgba(35, 134, 54, 0.5); }
+
+        /* نشان وضعیت پروکسی */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: 500;
+            background: rgba(0,0,0,0.3); border: 1px solid transparent;
+            color: var(--text-color);
+            border-color: var(--text-secondary-color);
+        }
+
+        .status-good { color: #3fb950; border-color: #3fb950; }
+        .status-medium { color: #d29922; border-color: #d29922; }
+        .status-bad { color: #f85149; border-color: #f85149; }
+        .status-unknown { color: var(--text-secondary-color); border-color: var(--text-secondary-color); }
+
+        /* انیمیشن نقطه چشمک‌زن */
+        .pulsing-dot { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(63, 185, 80, 0); }
+        }
+
+        /* انیمیشن لودینگ */
+        .loading-spinner {
+            width: 20px; height: 20px; border: 2px solid var(--border-color);
+            border-radius: 50%; border-top-color: var(--accent-color);
+            animation: spin 1s ease-in-out infinite;
+            transition: border-color 0.3s ease, border-top-color 0.3s ease;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* انیمیشن نمایش کارت‌ها */
+        .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(25px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in-down {
-            animation: fadeInDown 0.4s ease-out;
+
+        /* استایل مودال خوش‌آمدگویی */
+        .welcome-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(1, 4, 9, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            padding: 1rem;
+        }
+        .light-theme .welcome-modal-overlay { background-color: rgba(234, 247, 255, 0.8); }
+
+        .welcome-modal-overlay:not(.hidden) { opacity: 1; }
+
+        .welcome-modal-content {
+            background: linear-gradient(145deg, var(--card-bg-color), var(--bg-color));
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(47, 129, 247, 0.2), 0 0 0 1px rgba(47, 129, 247, 0.2);
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .light-theme .welcome-modal-content {
+            box-shadow: 0 0 50px rgba(0, 123, 255, 0.2), 0 0 0 1px rgba(0, 123, 255, 0.2);
         }
 
-        /* استایل برای پیغام خطا/موفقیت */
-        #message-toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
+        .welcome-modal-overlay:not(.hidden) .welcome-modal-content {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .welcome-modal-close {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary-color);
+            font-size: 30px;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+            line-height: 1;
+        }
+
+        .welcome-modal-close:hover {
+            color: var(--text-color);
+            transform: rotate(90deg);
+        }
+
+        .welcome-modal-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(47, 129, 247, 0.2) 0%, rgba(47, 129, 247, 0) 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .light-theme .welcome-modal-icon { background: radial-gradient(circle, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0) 70%); }
+
+        .welcome-modal-icon i {
+            font-size: 36px;
+            color: var(--accent-color);
+            text-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .welcome-modal-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 12px;
+        }
+
+        .welcome-modal-text {
+            font-size: 16px;
+            color: var(--text-secondary-color);
+            margin-bottom: 24px;
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .welcome-modal-link {
+            display: inline-block;
+            background: var(--accent-color);
+            color: #fff;
+            padding: 12px 24px;
             border-radius: 8px;
-            color: white;
-            opacity: 0;
-            transition: opacity 0.5s, transform 0.5s;
-            transform: translateY(100%);
-            z-index: 1000;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
         }
-        .toast-show {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
+
+        .welcome-modal-link:hover {
+            background: #1f6feb;
+            box-shadow: 0 0 20px rgba(47, 129, 247, 0.6);
+            transform: translateY(-2px);
         }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .form-control {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: var(--text-color);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.3);
+        }
+
+        .light-theme .form-control { color: var(--text-color); }
+        .light-theme .form-control:focus { box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); }
+
+        /* دکمه تغییر تم */
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--accent-color);
+        }
+
+        /* استایل لودینگ اسکلتون */
+        .skeleton-card {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            animation: skeleton-loading 1.5s linear infinite alternate;
+        }
+        .light-theme .skeleton-card { background-color: #e9ecef; border-color: #ced4da; }
+
+        .skeleton-line {
+            height: 16px;
+            background-color: #21262d;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        .light-theme .skeleton-line { background-color: #adb5bd; }
+
+        @keyframes skeleton-loading {
+            0% { opacity: 0.7; }
+            100% { opacity: 0.4; }
+        }
+
+        /* واکنش‌گرا کردن برای موبایل */
+        @media (max-width: 768px) {
+            .proxy-grid { grid-template-columns: 1fr; }
+            .control-row { flex-direction: column; align-items: stretch; gap: 16px; }
+            .control-panel .flex-col.md\:flex-row { flex-direction: column; align-items: center; }
+            .control-panel .flex.gap-6 { width: 100%; justify-content: space-around; }
+        }
+        
+        @media (min-width: 768px) {
+            .control-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1rem;
+            }
+        }
+
+        /* استایل اسکرول‌بار */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #21262d; border-radius: 4px; border: 1px solid #30363d;}
+        .light-theme ::-webkit-scrollbar-thumb { background: #ced4da; border-color: #adb5bd; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-    <div class="max-w-4xl mx-auto">
-        
-        <!-- عنوان اصلی (تغییر یافته) -->
-        <header class="text-center mb-10">
-            <i class="fa-solid fa-cloud text-4xl text-orange-600 mb-3"></i>
-            <h1 class="text-4xl font-extrabold text-gray-800">مرکز پیام‌های فوری</h1>
-            <p class="text-gray-500 mt-2">مکانی برای ثبت افکار عمومی و مشاهده آنلاین.</p>
+    <div id="welcomeModal" class="welcome-modal-overlay hidden">
+        <div class="welcome-modal-content">
+            <button id="closeWelcomeModal" class="welcome-modal-close">&times;</button>
+            <div class="welcome-modal-icon">
+                <i class="fa-brands fa-telegram text-4xl"></i>
+            </div>
+            <h2 class="welcome-modal-title">به پروکسی یاب خوش آمدید!</h2>
+            <p class="welcome-modal-text">نسل جدید پروکسی های امن و پرسرعت تلگرام</p>
+            <a href="https://t.me/VPN_MAR_KET" target="_blank" rel="noopener noreferrer" class="welcome-modal-link">
+                <i class="fa-brands fa-telegram ml-2"></i>
+                عضویت در کانال تلگرام
+            </a>
+        </div>
+    </div>
+    <main class="container mx-auto px-4 py-8 md:py-12 relative z-10">
+
+        <header class="text-center mb-12 fade-in-up">
+            <div class="flex justify-between items-center mb-6">
+                <div class="inline-block p-4 bg-gray-900/50 rounded-full border border-gray-800 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20">
+                    <i class="fa-brands fa-telegram text-4xl text-white"></i>
+                </div>
+                <button id="themeToggle" class="theme-toggle-btn">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-cyan-300">
+                پروکسی یاب تلگرام
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
+                نسل جدید دسترسی به پروکسی‌های امن و پرسرعت MTProto
+            </p>
+            <div class="inline-block mt-4 px-4 py-2 bg-gray-900/50 rounded-lg border border-gray-800">
+                <p id="lastUpdate" class="font-bold text-sm text-slate-400"></p>
+            </div>
         </header>
 
-        <!-- بخش ارسال پیام جدید -->
-        <section id="add-message-section" class="card p-6 rounded-xl mb-10">
-            <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-gray-700">ثبت پیام جدید</h2>
-            <form id="message-form" class="space-y-4">
-                
-                <div>
-                    <label for="message-content" class="block text-sm font-medium text-gray-700">پیام شما (<span id="char-count">0</span>/250)</label>
-                    <textarea id="message-content" rows="4" maxlength="250" required
-                        class="mt-1 block w-full p-3 border rounded-md shadow-sm resize-y"
-                        placeholder="حداکثر ۲۵۰ کاراکتر"></textarea>
-                </div>
-                
-                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 md:space-x-reverse">
-                    <div class="flex-1">
-                        <!-- تغییرات در فیلد نام مستعار -->
-                        <label for="message-author" class="block text-sm font-medium text-gray-700">نام مستعار (حداکثر ۲۰ کاراکتر)</label>
-                        <input type="text" id="message-author" value="" required maxlength="20"
-                            class="mt-1 block w-full p-3 border rounded-md shadow-sm"
-                            placeholder="نام خود را وارد کنید">
-                        <!-- end changes -->
-                    </div>
-                    <div class="flex-1">
-                        <label for="message-color" class="block text-sm font-medium text-gray-700">انتخاب رنگ کارت</label>
-                        <select id="message-color" class="mt-1 block w-full p-3 border rounded-md shadow-sm appearance-none">
-                            <option value="default">پیش‌فرض (نارنجی)</option>
-                            <option value="blue">آبی (اطلاعیه)</option>
-                            <option value="green">سبز (مثبت)</option>
-                            <option value="yellow">زرد (هشدار)</option>
-                            <option value="red">قرمز (مهم)</option>
-                        </select>
-                    </div>
-                </div>
+        <section id="control-panel" class="proxy-card p-6 mb-8 fade-in-up" style="animation-delay: 0.2s;">
+            <div class="card-content">
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-between mb-6">
+                    <button id="refreshBtn" class="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold flex items-center justify-center gap-2">
+                        <i id="refreshIcon" class="fa-solid fa-rotate btn-icon transition-transform duration-300"></i>
+                        <span>دریافت پروکسی جدید</span>
+                    </button>
 
-                <button type="submit" id="submit-btn"
-                        class="submit-btn w-full flex justify-center py-3 px-4 border border-transparent 
-                                rounded-md shadow-sm text-lg font-medium text-white hover:bg-orange-700 focus:outline-none">
-                    <i class="fa-solid fa-paper-plane ml-2"></i> ارسال پیام
-                </button>
-            </form>
-        </section>
-
-        <!-- بخش نمایش پیام‌ها و جستجو -->
-        <section>
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <!-- نمایش تعداد پیام‌های فعال -->
-                <h2 class="text-2xl font-bold text-gray-700">پیام‌های عمومی (<span id="message-count">0</span>)</h2>
-                <span id="user-info" class="text-sm text-gray-500">در حال اتصال...</span>
-            </div>
-            
-            <!-- نوار جستجو -->
-            <div class="mb-6 relative">
-                 <input type="text" id="search-input" oninput="filterMessages()" 
-                        class="w-full p-3 pr-10 border rounded-lg text-lg" 
-                        placeholder="جستجو بر اساس محتوا یا نام نویسنده...">
-                 <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            </div>
-            
-            <div id="messages-container" class="space-y-4">
-                <div id="loading-spinner" class="text-center text-gray-500 mt-8">
-                    <i class="fa-solid fa-spinner fa-spin text-4xl mb-3"></i><br>
-                    در حال بارگذاری پیام‌ها از دیتابیس...
-                </div>
-                <!-- پیام ها اینجا نمایش داده می شوند -->
-                <p id="no-message-placeholder" class="text-center text-gray-500 mt-8 hidden">
-                    <i class="fa-solid fa-inbox text-5xl mb-3"></i><br>
-                    هنوز پیامی ثبت نشده است. اولین نفر باشید!
-                </p>
-                <p id="no-result-placeholder" class="text-center text-gray-500 mt-8 hidden">
-                    <i class="fa-solid fa-search-minus text-5xl mb-3"></i><br>
-                    نتیجه‌ای برای جستجوی شما پیدا نشد.
-                </p>
-            </div>
-        </section>
-        
-        <!-- پیغام سفارشی (Toast Notification) -->
-        <div id="message-toast" class="opacity-0"></div>
-
-    </div>
-
-    <!-- Firebase Imports -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // تنظیم لاگ برای دیباگ (اختیاری)
-        setLogLevel('Debug');
-
-        // متغیرهای سراسری که توسط Canvas فراهم می‌شوند
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // متغیرهای دیتابیس
-        let db;
-        let auth;
-        let currentUserId;
-        // متغیر برای پیگیری اینکه کدام پیام در حال ویرایش است
-        let editingMessageId = null; 
-
-        // مسیر کالکشن عمومی برای همه کاربران
-        const collectionPath = `artifacts/${appId}/public/data/messages`;
-        // کلید ذخیره‌سازی نام مستعار در مرورگر
-        const AUTHOR_STORAGE_KEY = 'messageBoardAuthor';
-
-        // المان‌های DOM
-        const container = document.getElementById('messages-container');
-        const form = document.getElementById('message-form');
-        const contentInput = document.getElementById('message-content');
-        const authorInput = document.getElementById('message-author');
-        const colorSelect = document.getElementById('message-color');
-        const placeholder = document.getElementById('no-message-placeholder');
-        const noResultPlaceholder = document.getElementById('no-result-placeholder');
-        const charCountSpan = document.getElementById('char-count');
-        const searchInput = document.getElementById('search-input');
-        const submitBtn = document.getElementById('submit-btn');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const userInfoSpan = document.getElementById('user-info');
-        const messageCountSpan = document.getElementById('message-count'); 
-        
-        // متغیر برای ذخیره لیست پیام‌ها پس از بارگذاری اولیه
-        let allMessages = []; 
-
-        /**
-         * نمایش پیغام Toast سفارشی
-         * @param {string} message - متن پیغام
-         * @param {string} type - نوع پیغام (success, error, info)
-         */
-        function showToast(message, type) {
-            const toast = document.getElementById('message-toast');
-            toast.textContent = message;
-            toast.className = 'toast-show'; 
-            
-            if (type === 'success') {
-                toast.style.backgroundColor = '#10B981'; // Green-500
-            } else if (type === 'error') {
-                toast.style.backgroundColor = '#EF4444'; // Red-500
-            } else {
-                toast.style.backgroundColor = '#3B82F6'; // Blue-500 (info)
-            }
-
-            // پنهان کردن بعد از ۳ ثانیه
-            setTimeout(() => {
-                toast.classList.remove('toast-show');
-            }, 3000);
-        }
-        
-        // --- قابلیت جدید ۱: ذخیره و بازیابی نام مستعار (Local Storage) ---
-
-        /**
-         * ذخیره نام مستعار در Local Storage
-         * @param {string} author - نام مستعار کاربر
-         */
-        function saveAuthorToLocalStorage(author) {
-            try {
-                localStorage.setItem(AUTHOR_STORAGE_KEY, author);
-            } catch (e) {
-                console.warn("Could not save author to local storage:", e);
-            }
-        }
-
-        /**
-         * بازیابی نام مستعار از Local Storage
-         */
-        function loadAuthorFromLocalStorage() {
-            try {
-                const savedAuthor = localStorage.getItem(AUTHOR_STORAGE_KEY);
-                if (savedAuthor) {
-                    authorInput.value = savedAuthor;
-                }
-            } catch (e) {
-                console.warn("Could not load author from local storage:", e);
-            }
-        }
-
-        // --- پایان قابلیت جدید ۱ ---
-
-        // تابع کمکی برای فرمت تاریخ
-        function formatDate(timestamp) {
-            if (!timestamp) return 'تاریخ نامشخص';
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            return date.toLocaleDateString('fa-IR', options);
-        }
-
-        /**
-         * اتصال به فایربیس و احراز هویت
-         */
-        async function initializeFirebase() {
-            try {
-                if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
-                    throw new Error("Firebase configuration is missing or invalid.");
-                }
-
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                currentUserId = auth.currentUser?.uid || 'anonymous-user';
-                userInfoSpan.textContent = `شناسه شما: ${currentUserId.substring(0, 8)}...`;
-                
-                showToast("اتصال به دیتابیس موفقیت‌آمیز بود.", 'success');
-                
-                // شروع گوش دادن به پیام‌ها پس از احراز هویت
-                startMessageListener();
-                
-                // بارگذاری نام مستعار ذخیره شده
-                loadAuthorFromLocalStorage();
-
-            } catch (error) {
-                console.error("Firebase Initialization Error:", error);
-                userInfoSpan.textContent = "خطا در اتصال";
-                
-                if (error.message.includes("configuration is missing")) {
-                    showToast("خطا: تنظیمات Firebase پیدا نشد. دیتابیس فعال نیست.", 'error');
-                } else {
-                    showToast("خطا در اتصال به دیتابیس. لطفاً صفحه را رفرش کنید.", 'error');
-                }
-            }
-        }
-        
-        /**
-         * شروع گوش دادن به تغییرات در دیتابیس (Real-Time)
-         */
-        function startMessageListener() {
-            loadingSpinner.classList.remove('hidden');
-            
-            onSnapshot(collection(db, collectionPath), (snapshot) => {
-                const messages = [];
-                snapshot.forEach(doc => {
-                    messages.push({ id: doc.id, ...doc.data() }); 
-                });
-                
-                allMessages = messages;
-                loadingSpinner.classList.add('hidden');
-                
-                messageCountSpan.textContent = allMessages.length; 
-                
-                filterMessages(); 
-                
-                // در صورت موفقیت‌آمیز بودن هرگونه به‌روزرسانی، وضعیت ویرایش را ریست می‌کنیم
-                editingMessageId = null;
-
-            }, (error) => {
-                console.error("Error listening to messages:", error);
-                showToast("خطا در دریافت پیام‌ها: " + error.message, 'error');
-            });
-        }
-        
-        /**
-         * ایجاد المان HTML برای یک پیام
-         * @param {Object} msg - شی پیام
-         */
-        function createMessageElement(msg) {
-            const card = document.createElement('div');
-            const isOwner = msg.userId === currentUserId; 
-            const authorText = isOwner ? `${msg.author} (شما)` : msg.author;
-            
-            const likesCount = msg.likes?.count || 0; 
-            const isLiked = msg.likes?.likers && msg.likes.likers[currentUserId]; 
-
-            card.className = `message-card p-4 rounded-lg card fade-in-down color-${msg.color || 'default'}`;
-            card.setAttribute('data-id', msg.id); 
-
-            // اگر این پیام در حال ویرایش است، فرم ویرایش را نمایش بده
-            if (editingMessageId === msg.id && isOwner) {
-                card.innerHTML = `
-                    <div class="relative">
-                        <textarea id="edit-content-${msg.id}" rows="4" maxlength="250" 
-                            class="w-full p-2 border rounded-md shadow-sm resize-y text-lg"
-                            placeholder="حداکثر ۲۵۰ کاراکتر">${msg.content}</textarea>
-                        
-                        <div class="flex justify-end space-x-2 space-x-reverse mt-3">
-                            <button onclick="saveEdit('${msg.id}')" 
-                                    class="bg-green-500 hover:bg-green-600 text-white text-sm py-1 px-3 rounded-md transition duration-150">
-                                <i class="fa-solid fa-save ml-1"></i> ذخیره
-                            </button>
-                            <button onclick="cancelEdit('${msg.id}')" 
-                                    class="bg-gray-400 hover:bg-gray-500 text-white text-sm py-1 px-3 rounded-md transition duration-150">
-                                <i class="fa-solid fa-xmark ml-1"></i> انصراف
-                            </button>
+                    <div class="flex gap-6 items-center">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold" id="proxyCount">0</div>
+                            <div class="text-sm text-slate-400">کل پروکسی‌ها</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-400" id="activeCount">0</div>
+                            <div class="text-sm text-slate-400">فعال</div>
                         </div>
                     </div>
-                `;
+
+                    <button id="testAllBtn" class="btn btn-success w-full md:w-auto px-6 py-3 text-base font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt-lightning btn-icon transition-transform duration-300"></i>
+                        <span>تست همه</span>
+                    </button>
+
+                    <button id="install-pwa-button" class="btn btn-primary w-full md:w-auto px-6 py-3 text-base font-semibold hidden">
+                        <i class="fa-solid fa-download btn-icon transition-transform duration-300"></i>
+                        <span>نصب برنامه</span>
+                    </button>
+                </div>
+
+                <div class="control-grid grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="relative flex items-center">
+                        <i class="fa-solid fa-magnifying-glass absolute right-4 text-slate-500"></i>
+                        <input type="text" id="searchInput" class="form-control pr-12 text-base" placeholder="جستجو بر اساس سرور یا کشور..." />
+                    </div>
+                    <div class="relative">
+                        <select id="sortSelect" class="form-control text-base pl-8 appearance-none">
+                            <option value="default" selected>مرتب‌سازی: پیش‌فرض</option>
+                            <option value="ping">مرتب‌سازی: پینگ کمتر</option>
+                            <option value="country">مرتب‌سازی: بر اساس کشور</option>
+                            <option value="status">مرتب‌سازی: بر اساس وضعیت</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                    </div>
+                    <div class="relative">
+                        <select id="perPageSelect" class="form-control text-base pl-8 appearance-none">
+                            <option value="5" selected>تعداد نمایش: 5</option>
+                            <option value="10">تعداد نمایش: 10</option>
+                            <option value="15">تعداد نمایش: 15</option>
+                            <option value="20">تعداد نمایش: 20</option>
+                            <option value="30">تعداد نمایش: 30</option>
+                            <option value="40">تعداد نمایش: 40</option>
+                            <option value="50">تعداد نمایش: 50</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="status" class="text-center mb-8 hidden">
+            <div class="inline-flex items-center gap-3 text-slate-300">
+                <div class="loading-spinner"></div>
+                <span class="font-medium">در حال بارگذاری و تست پروکسی‌ها...</span>
+            </div>
+        </div>
+
+        <div id="skeletonList" class="proxy-grid">
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line w-75"></div><div class="skeleton-line w-50"></div><div class="skeleton-line"></div></div>
+        </div>
+
+        <div id="proxyList" class="proxy-grid hidden"></div>
+
+        <div id="loadMoreContainer" class="text-center mt-8 hidden">
+            <button id="loadMoreBtn" class="btn px-8 py-3 text-base font-semibold">
+                <i class="fa-solid fa-chevron-down ml-2 btn-icon"></i> نمایش بیشتر
+            </button>
+        </div>
+
+        <div id="noResults" class="text-center py-16 hidden">
+             <div class="proxy-card p-12 inline-block">
+                <div class="card-content">
+                    <div class="w-24 h-24 bg-slate-800/60 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-700">
+                        <i class="fa-solid fa-ghost text-4xl text-slate-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">پروکسی یافت نشد!</h3>
+                    <p class="text-slate-400 mb-6">لطفاً لیست را بروزرسانی کنید یا بعداً تلاش کنید.</p>
+                    <button onclick="loadProxies()" class="btn btn-primary px-6 py-3">
+                        <i class="fa-solid fa-rotate mr-2"></i> تلاش مجدد
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-8 mt-12 border-t border-gray-800 text-slate-400 fade-in-up" style="animation-delay: 0.4s;">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+
+                <div class="flex flex-col items-center md:items-start gap-3">
+                    <div class="flex items-center gap-3">
+                        <i class="fab fa-telegram text-2xl text-sky-400"></i>
+                        <h4 class="font-bold text-lg">به کانال تلگرام ما بپیوندید</h4>
+                    </div>
+                    <p>برای دریافت آخرین پروکسی‌ها و اطلاع از بروزرسانی‌ها، ما را دنبال کنید.</p>
+                    <a href="https://t.me/VPN_MAR_KET" target="_blank" rel="noopener noreferrer"
+                       class="group inline-block mt-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 font-semibold py-2 px-5 border border-sky-500/20 rounded-lg transition-all duration-300">
+                         @VPN_MAR_KET <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    </a>
+                </div>
+
+                <div class="flex flex-col items-center md:items-end gap-3">
+                     <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-code text-xl text-green-400"></i>
+                        <h4 class="font-bold text-lg">طراح و توسعه دهنده</h4>
+                    </div>
+                    <p>ساخته شده با <i class="fa-solid fa-heart text-red-500"></i> برای دسترسی آزاد</p>
+                     <a href="https://t.me/reza_gh_ni" target="_blank" rel="noopener noreferrer"
+                       class="group inline-block mt-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-semibold py-2 px-5 border border-green-500/20 rounded-lg transition-all duration-300">
+                        @reza_gh_ni
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    </a>
+                </div>
+
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-800/50 text-sm">
+                <p class="flex items-center justify-center gap-x-2 flex-wrap">
+                    <span>&copy; 1404 پروکسی یاب تلگرام. تمامی حقوق محفوظ است.</span>
+                    <span class="bg-sky-500/10 text-sky-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-sky-500/20">نسخه 1.2</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // Interactive Glow Effect for Cards
+        document.addEventListener('mousemove', e => {
+            const cards = document.querySelectorAll('.proxy-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        }, { passive: true });
+
+        // Theme Toggle Functionality
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        // تابع برای اعمال تم به سند و ذخیره آن در حافظه
+        const setTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
             } else {
-                // در حالت عادی، پیام را نمایش بده
-                card.innerHTML = `
-                    <div class="relative min-h-[30px]">
-                        <p class="text-lg text-gray-800 mb-2 whitespace-pre-wrap">${msg.content}</p>
-                        
-                        <!-- دکمه‌های حذف و ویرایش (راست بالا) -->
-                        ${isOwner ? `
-                            <div class="absolute top-0 right-0 flex space-x-2 space-x-reverse">
-                                <button onclick="startEdit('${msg.id}', '${msg.content.replace(/'/g, "\\'")}')" 
-                                        class="text-gray-400 hover:text-blue-500 transition duration-150 p-1"
-                                        title="ویرایش پیام">
-                                    <i class="fa-solid fa-pen-to-square text-sm"></i>
-                                </button>
-                                <button onclick="deleteMessage('${msg.id}')" 
-                                        class="text-gray-400 hover:text-red-500 transition duration-150 p-1"
-                                        title="حذف پیام شما">
-                                    <i class="fa-solid fa-trash-can text-sm"></i>
-                                </button>
-                            </div>
-                        ` : ''}
-                        
-                        <!-- دکمه لایک (چپ بالا) -->
-                        <button onclick="toggleLike('${msg.id}')" 
-                                class="absolute top-0 left-0 flex items-center p-1 rounded-full ${isLiked ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-400'} transition duration-200"
-                                title="${isLiked ? 'لغو لایک' : 'لایک کردن'}">
-                            <i class="fa-${isLiked ? 'solid' : 'regular'} fa-heart text-lg"></i>
-                            <span class="mr-1 text-sm font-bold">${likesCount}</span>
-                        </button>
-                    </div>
-                    
-                    <div class="flex justify-between items-center text-sm text-gray-500 mt-3 border-t pt-2">
-                        <span class="font-medium">
-                            <i class="fa-solid fa-user-edit ml-1"></i> ${authorText}
-                        </span>
-                        <span class="text-xs">
-                            <i class="fa-solid fa-clock ml-1"></i> ${formatDate(msg.timestamp)}
-                        </span>
-                    </div>
-                `;
+                document.documentElement.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
             }
-            return card;
-        }
+            localStorage.setItem('theme', theme);
+        };
 
-        /**
-         * ذخیره پیام جدید در دیتابیس
-         */
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if (!db || !currentUserId) {
-                showToast("لطفاً منتظر بمانید تا اتصال برقرار شود.", 'error');
-                return;
+        // تابع برای دریافت تم مورد نظر از حافظه یا تنظیمات سیستم
+        const getPreferredTheme = () => {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme) {
+                return storedTheme;
             }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
 
-            const content = contentInput.value.trim();
-            const author = authorInput.value.trim(); 
-            const color = colorSelect.value;
-            
-            if (!content) {
-                showToast("لطفاً محتوای پیام را وارد کنید.", 'error');
-                return;
-            }
-            
-            if (!author) {
-                 showToast("لطفاً نام مستعار خود را وارد کنید.", 'error');
-                 return;
-            } else if (author.length > 20) {
-                 showToast("نام مستعار نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.", 'error');
-                 return;
-            }
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin ml-2"></i> در حال ارسال...';
+        const currentTheme = getPreferredTheme();
+        setTheme(currentTheme);
 
-            const newMessage = {
-                content: content,
-                author: author, 
-                color: color,
-                userId: currentUserId, 
-                timestamp: new Date(),
-                likes: { 
-                    count: 0,
-                    likers: {}
-                }
-            };
-
-            try {
-                await addDoc(collection(db, collectionPath), newMessage);
-
-                // --- قابلیت جدید ۱: ذخیره نام مستعار پس از ارسال موفق ---
-                saveAuthorToLocalStorage(author);
-                // --- پایان قابلیت جدید ۱ ---
-
-                // پاک کردن فیلد محتوا، اما نام مستعار را حفظ می‌کنیم
-                contentInput.value = '';
-                charCountSpan.textContent = '0';
-                colorSelect.value = 'default';
-                
-                showToast("پیام شما با موفقیت ثبت شد.", 'success');
-
-            } catch (e) {
-                console.error("Error adding document: ", e);
-                showToast("خطا در ثبت پیام: " + e.message, 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane ml-2"></i> ارسال پیام';
-            }
+        themeToggleBtn.addEventListener('click', () => {
+            const activeTheme = localStorage.getItem('theme');
+            const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
         });
 
-        // --- قابلیت جدید ۲: ویرایش پیام ---
 
-        /**
-         * شروع حالت ویرایش: آیدی پیام را ذخیره کرده و لیست پیام‌ها را رفرش می‌کند تا حالت ویرایش نمایش داده شود
-         * @param {string} id - شناسه داک فایراستور
-         */
-        function startEdit(id) {
-            if (editingMessageId !== null) {
-                showToast("لطفاً ابتدا ویرایش پیام قبلی را ذخیره یا لغو کنید.", 'info');
-                return;
-            }
-            editingMessageId = id;
-            filterMessages(); // رفرش لیست برای نمایش فرم ویرایش
-        }
-        window.startEdit = startEdit;
+        // Main application logic
+        let allProxies = [];
+        let visibleProxies = [];
+        let isLoading = false;
+        let perPage = 5;
+        let currentPage = 0;
+        let currentSort = 'default';
+        let currentSearch = '';
+        let autoPingInterval;
 
-        /**
-         * لغو حالت ویرایش: آیدی پیام را ریست کرده و لیست پیام‌ها را رفرش می‌کند
-         * @param {string} id - شناسه داک فایراستور
-         */
-        function cancelEdit(id) {
-            editingMessageId = null;
-            filterMessages(); // رفرش لیست برای نمایش حالت عادی
-        }
-        window.cancelEdit = cancelEdit;
+        const elements = {
+            refreshBtn: document.getElementById('refreshBtn'),
+            testAllBtn: document.getElementById('testAllBtn'),
+            refreshIcon: document.getElementById('refreshIcon'),
+            proxyCount: document.getElementById('proxyCount'),
+            activeCount: document.getElementById('activeCount'),
+            status: document.getElementById('status'),
+            proxyList: document.getElementById('proxyList'),
+            skeletonList: document.getElementById('skeletonList'),
+            noResults: document.getElementById('noResults'),
+            loadMoreContainer: document.getElementById('loadMoreContainer'),
+            loadMoreBtn: document.getElementById('loadMoreBtn'),
+            searchInput: document.getElementById('searchInput'),
+            sortSelect: document.getElementById('sortSelect'),
+            perPageSelect: document.getElementById('perPageSelect'),
+            lastUpdate: document.getElementById('lastUpdate')
+        };
 
-        /**
-         * ذخیره تغییرات ویرایش شده در دیتابیس
-         * @param {string} id - شناسه داک فایراستور
-         */
-        async function saveEdit(id) {
-            if (!db) return;
+        const countryTranslations = {
+            'Russia': '🇷🇺 روسیه', 'Netherlands': '🇳🇱 هلند', 'United States': '🇺🇸 آمریکا',
+            'Germany': '🇩🇪 آلمان', 'France': '🇫🇷 فرانسه', 'United Kingdom': '🇬🇧 انگلستان',
+            'Canada': '🇨🇦 کانادا', 'Italy': '🇮🇹 ایتالیا', 'Spain': '🇪🇸 اسپانیا', 'Turkey': '🇹🇷 ترکیه',
+            'Finland': '🇫🇮 فنلاند', 'Sweden': '🇸🇪 سوئد', 'Poland': '🇵🇱 لهستان', 'Iran': '🇮🇷 ایران'
+        };
 
-            const newContentInput = document.getElementById(`edit-content-${id}`);
-            const newContent = newContentInput ? newContentInput.value.trim() : '';
+        const getCountryName = (country) => countryTranslations[country] || `🌍 ${country || 'نامشخص'}`;
 
-            if (newContent.length === 0 || newContent.length > 250) {
-                showToast("محتوای پیام باید بین ۱ تا ۲۵۰ کاراکتر باشد.", 'error');
-                return;
-            }
+        // تابع debounce برای بهینه‌سازی فراخوانی توابع
+        const debounce = (func, delay) => {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(null, args);
+                }, delay);
+            };
+        };
+
+        const loadProxies = async () => {
+            if (isLoading) return;
+            setLoadingState(true);
             
-            // جلوگیری از ویرایش مجدد دکمه تا اتمام عملیات
-            const saveBtn = newContentInput.nextElementSibling.querySelector('.bg-green-500');
-            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin ml-1"></i> ذخیره...';
-            saveBtn.disabled = true;
+            elements.skeletonList.classList.remove('hidden');
+            elements.proxyList.classList.add('hidden');
 
             try {
-                const messageRef = doc(db, collectionPath, id);
-                await updateDoc(messageRef, {
-                    content: newContent,
-                    // به‌روزرسانی زمان برای نمایش به عنوان پیام به‌روزرسانی شده
-                    timestamp: new Date() 
-                });
+                const response = await fetch("https://raw.githubusercontent.com/hookzof/socks5_list/master/tg/mtproto.json");
+                if (!response.ok) throw new Error("Network response was not ok");
+                const data = await response.json();
+                allProxies = (Array.isArray(data) ? data : data.proxies || []).map((p, i) => ({
+                    id: i, server: p.server || p.host, port: p.port, secret: p.secret,
+                    country: getCountryName(p.country), ping: null, status: 'unknown'
+                }));
+                showToastNotification('✅ پروکسی‌ها با موفقیت بارگذاری شدند.', 'success');
                 
-                editingMessageId = null; // onSnapshot خودکار این را ریست می‌کند، اما اینجا هم برای اطمینان
-                showToast("پیام با موفقیت ویرایش شد.", 'success');
-                // نیازی به فراخوانی filterMessages نیست زیرا onSnapshot همه چیز را به‌روز می‌کند
-            } catch (e) {
-                console.error("Error updating document: ", e);
-                showToast("خطا در ویرایش پیام: " + e.message, 'error');
-            }
-        }
-        window.saveEdit = saveEdit;
-        
-        // --- پایان قابلیت جدید ۲ ---
+                // --- کد جدید برای نمایش تاریخ و ساعت ---
+                const now = new Date();
+                const jalaali = new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', hour12: false
+                }).format(now);
 
+                elements.lastUpdate.textContent = `آخرین بروزرسانی: ${jalaali}`;
+                // ------------------------------------
 
-        /**
-         * مدیریت لایک/لغو لایک برای یک پیام (کد قبلی بدون تغییر)
-         */
-        async function toggleLike(messageId) {
-            if (!db || !currentUserId) {
-                showToast("لطفاً منتظر بمانید تا اتصال برقرار شود.", 'error');
-                return;
-            }
+            } catch (error) {
+                allProxies = [
+                    { id: 0, server: "proxy.digitalresistance.dog", port: "443", secret: "ddd41d8cd98f00b204e9800998ecf8427e", country: "🇩🇪 آلمان", ping: null, status: 'unknown' },
+                    { id: 1, server: "149.154.175.100", port: "443", secret: "ee1111111111111111111111111111111111", country: "🇷🇺 روسیه", ping: null, status: 'unknown' },
+                    { id: 2, server: "mtpro.co.uk", port: "443", secret: "ee0000000000000000000000000000000000", country: "🇬🇧 انگلستان", ping: null, status: 'unknown' },
+                ];
+                showToastNotification('⚠️ از لیست پیش‌فرض استفاده می‌شود.', 'warning');
+                elements.lastUpdate.textContent = `آخرین بروزرسانی: ${new Intl.DateTimeFormat('fa-IR', {
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: 'numeric', minute: 'numeric', hour12: false
+                }).format(new Date())}`;
+            } finally {
+                elements.skeletonList.classList.add('hidden');
+                elements.proxyList.classList.remove('hidden');
 
-            try {
-                const messageRef = doc(db, collectionPath, messageId);
-                const messageToUpdate = allMessages.find(msg => msg.id === messageId);
-
-                if (!messageToUpdate) {
-                    showToast("پیام مورد نظر پیدا نشد.", 'error');
-                    return;
+                applyFiltersAndSort();
+                updateCounts();
+                setLoadingState(false);
+                if (allProxies.length > 0) {
+                     testAllProxiesAuto();
                 }
-                
-                let currentLikes = messageToUpdate.likes?.count || 0;
-                let likers = {...(messageToUpdate.likes?.likers || {})}; 
-                
-                let newLikesCount = currentLikes;
-                let action = '';
-
-                if (likers[currentUserId]) {
-                    delete likers[currentUserId];
-                    newLikesCount = currentLikes - 1;
-                    action = 'لغو لایک';
-                } else {
-                    likers[currentUserId] = true;
-                    newLikesCount = currentLikes + 1;
-                    action = 'لایک';
-                }
-
-                await updateDoc(messageRef, {
-                    likes: {
-                        count: newLikesCount,
-                        likers: likers
-                    }
-                });
-
-                showToast(`پیام با موفقیت ${action} شد.`, 'success');
-
-            } catch (e) {
-                console.error("Error toggling like: ", e);
-                showToast("خطا در عملیات لایک: " + e.message, 'error');
             }
-        }
-        window.toggleLike = toggleLike;
-        
-        /**
-         * حذف یک پیام خاص از دیتابیس (کد قبلی بدون تغییر)
-         */
-        async function deleteMessage(id) {
-            if (!window.confirm('آیا مطمئن هستید که می‌خواهید این پیام را حذف کنید؟')) {
-                return;
-            }
-            if (!db) return; 
+        };
 
-            try {
-                await deleteDoc(doc(db, collectionPath, id));
-                showToast("پیام حذف شد.", 'info');
-            } catch (e) {
-                console.error("Error deleting document: ", e);
-                showToast("خطا در حذف پیام: " + e.message, 'error');
-            }
-        }
-        window.deleteMessage = deleteMessage;
-        
-        /**
-         * فیلتر کردن پیام‌ها بر اساس ورودی جستجو و نمایش آن‌ها (کد قبلی بدون تغییر)
-         */
-        function filterMessages() {
-            const filterText = searchInput.value.trim();
-            container.innerHTML = '';
+        const applyFiltersAndSort = () => {
+            let filtered = [...allProxies];
             
-            const sortedMessages = [...allMessages].sort((a, b) => {
-                const timeDiff = b.timestamp.seconds - a.timestamp.seconds;
-                if (timeDiff !== 0) return timeDiff;
-                
-                const likesA = a.likes?.count || 0;
-                const likesB = b.likes?.count || 0;
-                return likesB - likesA;
-            });
-            
-            let filteredMessages = sortedMessages;
-            
-            if (filterText) {
-                const lowerCaseFilter = filterText.toLowerCase();
-                filteredMessages = sortedMessages.filter(msg => 
-                    msg.content.toLowerCase().includes(lowerCaseFilter) ||
-                    msg.author.toLowerCase().includes(lowerCaseFilter)
+            if (currentSearch) {
+                const searchTerm = currentSearch.toLowerCase();
+                filtered = filtered.filter(p =>
+                    p.server.toLowerCase().includes(searchTerm) ||
+                    p.country.toLowerCase().includes(searchTerm)
                 );
             }
             
-            placeholder.classList.add('hidden');
-            noResultPlaceholder.classList.add('hidden');
-            
-            if (allMessages.length === 0 && !loadingSpinner.classList.contains('hidden')) {
-                return; 
-            } else if (allMessages.length === 0) {
-                placeholder.classList.remove('hidden');
-            } else if (filteredMessages.length === 0 && filterText) {
-                 noResultPlaceholder.classList.remove('hidden');
+            switch (currentSort) {
+                case 'ping':
+                    filtered.sort((a, b) => (a.ping === null) - (b.ping === null) || a.ping - b.ping);
+                    break;
+                case 'country':
+                    filtered.sort((a, b) => a.country.localeCompare(b.country));
+                    break;
+                case 'status':
+                    const statusOrder = { 'good': 1, 'medium': 2, 'bad': 3, 'unknown': 4 };
+                    filtered.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+                    break;
             }
+            
+            visibleProxies = filtered;
+            currentPage = 0;
+            renderProxies();
+            updateLoadMoreButton();
+        };
 
-            filteredMessages.forEach(msg => {
-                const messageElement = createMessageElement(msg);
-                container.appendChild(messageElement);
+        const renderProxies = () => {
+            const proxiesToRender = visibleProxies.slice(0, (currentPage + 1) * perPage);
+            elements.proxyList.innerHTML = '';
+            if (proxiesToRender.length === 0) {
+                elements.noResults.classList.remove('hidden'); return;
+            }
+            elements.noResults.classList.add('hidden');
+
+            proxiesToRender.forEach((proxy, index) => {
+                const card = document.createElement('div');
+                card.className = 'proxy-card fade-in-up';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.id = `proxy-card-${proxy.id}`;
+                card.innerHTML = getProxyCardHTML(proxy);
+                elements.proxyList.appendChild(card);
+            });
+            addCardEventListeners();
+        };
+        
+        const getProxyCardHTML = (proxy) => {
+            const statusInfo = getStatusInfo(proxy.status);
+            const pingInfo = getPingInfo(proxy.ping);
+
+            return `
+                <div class="card-content space-y-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full ${statusInfo.dotClass} ${statusInfo.pulseClass}" title="${statusInfo.text}"></div>
+                            <h3 class="font-bold text-lg">${proxy.server}</h3>
+                        </div>
+                        <span class="status-badge ${statusInfo.className}">
+                            <i class="${statusInfo.icon}"></i> ${statusInfo.text}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-slate-300">
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-slate-400 w-4 text-center"></i><span>${proxy.country}</span></div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-ethernet text-slate-400 w-4 text-center"></i><span>${proxy.port}</span></div>
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-signal text-slate-400 w-4 text-center"></i><span id="ping-${proxy.id}" class="font-semibold ${pingInfo.className}">${pingInfo.text}</span></div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="text-sm text-slate-400">کلید امنیتی (Secret)</div>
+                        <div class="p-2 text-xs break-all bg-gray-900/70 rounded-md border border-gray-700 font-mono">${proxy.secret}</div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 pt-2">
+                        <button data-id="${proxy.id}" class="ping-btn btn flex items-center justify-center gap-2 py-2"><i class="fa-solid fa-bolt btn-icon transition-transform duration-300"></i> تست</button>
+                        <button data-id="${proxy.id}" class="copy-btn btn flex items-center justify-center gap-2 py-2"><i class="fa-solid fa-copy btn-icon transition-transform duration-300"></i> کپی</button>
+                        <button data-id="${proxy.id}" class="connect-btn btn btn-primary flex items-center justify-center gap-2 py-2"><i class="fa-solid fa-paper-plane btn-icon transition-transform duration-300"></i> اتصال</button>
+                    </div>
+                </div>
+            `;
+        };
+        
+        const testPing = async (proxyId) => {
+            const proxy = allProxies.find(p => p.id === proxyId);
+            if (!proxy) return;
+            
+            const pingElement = document.getElementById(`ping-${proxyId}`);
+            if (pingElement) pingElement.innerHTML = '<div class="loading-spinner !w-4 !h-4"></div>';
+
+            const simulatedDelay = Math.random() * 800 + 50;
+            await new Promise(resolve => setTimeout(resolve, simulatedDelay));
+
+            const ping = Math.round(simulatedDelay);
+            proxy.ping = ping;
+            proxy.status = ping < 250 ? 'good' : ping < 600 ? 'medium' : 'bad';
+            
+            updateCard(proxyId);
+            updateCounts();
+        };
+
+        const testAllProxies = async () => {
+            if (allProxies.length === 0) return;
+            elements.testAllBtn.disabled = true;
+            elements.testAllBtn.innerHTML = '<div class="loading-spinner"></div>';
+            await Promise.all(visibleProxies.map(p => testPing(p.id)));
+            elements.testAllBtn.disabled = false;
+            elements.testAllBtn.innerHTML = '<i class="fa-solid fa-bolt-lightning btn-icon transition-transform duration-300"></i> <span>تست همه</span>';
+            showToastNotification('✅ تست همه پروکسی‌های نمایش داده شده کامل شد.', 'success');
+        };
+
+        const testAllProxiesAuto = async () => {
+            const proxiesToTest = [...allProxies];
+            for (let i = 0; i < proxiesToTest.length; i++) {
+                await testPing(proxiesToTest[i].id);
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            applyFiltersAndSort();
+            showToastNotification('✅ تست خودکار پینگ همه پروکسی‌ها به پایان رسید.', 'success');
+        };
+
+        const copyProxy = (proxyId) => {
+            const proxy = allProxies.find(p => p.id === proxyId);
+            const proxyUrl = `tg://proxy?server=${proxy.server}&port=${proxy.port}&secret=${proxy.secret}`;
+            navigator.clipboard.writeText(proxyUrl).then(() => {
+                showToastNotification('✅ لینک پروکسی با موفقیت کپی شد!', 'success');
+            }).catch(err => showToastNotification('❌ خطا در کپی کردن لینک!', 'error'));
+        };
+
+        const connectTelegram = (proxyId) => {
+            const proxy = allProxies.find(p => p.id === proxyId);
+            window.location.href = `tg://proxy?server=${proxy.server}&port=${proxy.port}&secret=${proxy.secret}`;
+            showToastNotification('🚀 در حال تلاش برای اتصال به تلگرام...', 'info');
+        };
+        
+        const setLoadingState = (state) => {
+            isLoading = state;
+            elements.refreshBtn.disabled = state;
+            elements.refreshIcon.classList.toggle('fa-spin', state);
+            elements.status.classList.toggle('hidden', !state);
+            if (state) {
+                elements.proxyList.innerHTML = '';
+                elements.noResults.classList.add('hidden');
+                elements.loadMoreContainer.classList.add('hidden');
+            }
+        };
+        
+        const updateCard = (proxyId) => {
+            const proxy = allProxies.find(p => p.id === proxyId);
+            const cardElement = document.getElementById(`proxy-card-${proxyId}`);
+            if (cardElement) {
+                cardElement.innerHTML = getProxyCardHTML(proxy);
+                addCardEventListeners(cardElement);
+            }
+        };
+        
+        const addCardEventListeners = (scope = document) => {
+            scope.querySelectorAll('.ping-btn').forEach(btn => btn.addEventListener('click', e => testPing(parseInt(e.currentTarget.dataset.id))));
+            scope.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', e => copyProxy(parseInt(e.currentTarget.dataset.id))));
+            scope.querySelectorAll('.connect-btn').forEach(btn => btn.addEventListener('click', e => connectTelegram(parseInt(e.currentTarget.dataset.id))));
+        };
+        
+        const getStatusInfo = (status) => {
+            switch(status) {
+                case 'good': return { text: 'عالی', icon: 'fa-solid fa-circle-check', className: 'status-good', dotClass: 'bg-green-400', pulseClass: 'pulsing-dot' };
+                case 'medium': return { text: 'متوسط', icon: 'fa-solid fa-triangle-exclamation', className: 'status-medium', dotClass: 'bg-yellow-400', pulseClass: '' };
+                case 'bad': return { text: 'ضعیف', icon: 'fa-solid fa-circle-xmark', className: 'status-bad', dotClass: 'bg-red-400', pulseClass: '' };
+                default: return { text: 'نامشخص', icon: 'fa-solid fa-circle-question', className: 'status-unknown', dotClass: 'bg-slate-500', pulseClass: '' };
+            }
+        };
+
+        const getPingInfo = (ping) => {
+            if (ping === null) return { text: 'تست نشده', className: 'text-slate-400' };
+            if (ping < 250) return { text: `${ping}ms`, className: 'text-green-400' };
+            if (ping < 600) return { text: `${ping}ms`, className: 'text-yellow-400' };
+            return { text: `${ping}ms`, className: 'text-red-400' };
+        };
+
+        const updateCounts = () => {
+            elements.proxyCount.textContent = allProxies.length;
+            elements.activeCount.textContent = allProxies.filter(p => p.status === 'good').length;
+        };
+
+        const loadMoreProxies = () => {
+            currentPage++;
+            renderProxies();
+            updateLoadMoreButton();
+        };
+
+        const updateLoadMoreButton = () => {
+            const visibleCount = (currentPage + 1) * perPage;
+            elements.loadMoreContainer.classList.toggle('hidden', visibleCount >= visibleProxies.length);
+        };
+        
+        // General Toast Notification
+        const showToastNotification = (message, type = 'info') => {
+            const notif = document.createElement('div');
+            const typeClasses = {
+                success: 'bg-green-600/80 border-green-500', error: 'bg-red-600/80 border-red-500',
+                warning: 'bg-yellow-600/80 border-yellow-500', info: 'bg-blue-600/80 border-blue-500',
+            };
+            notif.className = `fixed top-5 right-5 z-50 px-5 py-3 rounded-lg text-white font-semibold border-l-4 ${typeClasses[type]} proxy-card`;
+            notif.style.cssText = `transform: translateX(200%); transition: transform 0.5s ease;`;
+            notif.innerHTML = `<div class="card-content">${message}</div>`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.style.transform = 'translateX(0)', 10);
+            setTimeout(() => {
+                notif.style.transform = 'translateX(200%)';
+                notif.addEventListener('transitionend', () => notif.remove());
+            }, 4000);
+        };
+
+        // Welcome Modal Logic
+        const welcomeModal = document.getElementById('welcomeModal');
+        const closeWelcomeModalBtn = document.getElementById('closeWelcomeModal');
+
+        const showWelcomeModal = () => {
+            if (sessionStorage.getItem('welcomeModalSeen')) {
+                return;
+            }
+            if (welcomeModal) {
+                 welcomeModal.classList.remove('hidden');
+            }
+        };
+
+        const hideWelcomeModal = () => {
+            if (welcomeModal) {
+                const content = welcomeModal.querySelector('.welcome-modal-content');
+                welcomeModal.style.opacity = '0';
+                if(content) content.style.transform = 'scale(0.9)';
+                
+                const onTransitionEnd = () => {
+                    welcomeModal.classList.add('hidden');
+                    welcomeModal.removeEventListener('transitionend', onTransitionEnd);
+                };
+                welcomeModal.addEventListener('transitionend', onTransitionEnd);
+            }
+            sessionStorage.setItem('welcomeModalSeen', 'true');
+        };
+
+        if (closeWelcomeModalBtn) {
+            closeWelcomeModalBtn.addEventListener('click', hideWelcomeModal);
+        }
+
+        if (welcomeModal) {
+            welcomeModal.addEventListener('click', (e) => {
+                if (e.target === welcomeModal) {
+                    hideWelcomeModal();
+                }
             });
         }
-        window.filterMessages = filterMessages;
 
+        // ایجاد یک نسخه debounce شده از تابع فیلتر کردن
+        const debouncedSearch = debounce(() => {
+            applyFiltersAndSort();
+        }, 300);
 
-        // اجرای اولیه: اتصال به فایربیس
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeFirebase();
-            // به‌روزرسانی شمارنده کاراکتر
-            contentInput.addEventListener('input', () => {
-                charCountSpan.textContent = contentInput.value.length;
-            });
+        elements.refreshBtn.addEventListener('click', loadProxies);
+        elements.testAllBtn.addEventListener('click', testAllProxies);
+        elements.loadMoreBtn.addEventListener('click', loadMoreProxies);
+        
+        elements.searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            debouncedSearch();
+        });
+        
+        elements.sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            applyFiltersAndSort();
+        });
+        
+        elements.perPageSelect.addEventListener('change', (e) => {
+            perPage = parseInt(e.target.value);
+            applyFiltersAndSort();
+        });
+
+        window.addEventListener('load', () => {
+            loadProxies();
+            setTimeout(showWelcomeModal, 700);
         });
     </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered!', reg))
+                    .catch(err => console.log('Service Worker registration failed: ', err));
+            });
+        }
+    </script>
+    
+    <script src="/pwa-install.js"></script>
+
 </body>
 </html>
