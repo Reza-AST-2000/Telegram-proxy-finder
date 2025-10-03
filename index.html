@@ -3,456 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مبدل تبدیل ارز</title>
+    <title>تابلوی اعلانات ساده</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
-
+    
     <style>
         body {
-            font-family: 'Vazirmatn', sans-serif; 
-            background-color: #f3f4f6; 
-            color: #1f2937; 
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f3f4f6;
             direction: rtl;
-            display: flex; 
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .main-content {
-            flex-grow: 1; 
-            display: flex;
-            justify-content: center;
-            padding: 1.5rem;
         }
         .card {
-            background-color: #ffffff; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
-            border: 1px solid #e5e7eb; 
-            color: #1f2937; 
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
         }
-        
-        .input-group input, .input-group select, .result-box, .notification-box {
-            background-color: #f9fafb; 
-            border: 1px solid #d1d5db;
-            color: #1f2937; 
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+        .message-card {
+            border-right: 4px solid #F97316; /* رنگ نارنجی برای تاکید */
+            transition: transform 0.2s;
         }
-        .input-group input:focus, .input-group select:focus {
+        .message-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], textarea {
+            border-color: #d1d5db;
+        }
+        input[type="text"]:focus, textarea:focus {
+            border-color: #F97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
             outline: none;
-            border-color: #00BCD4; 
-            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
         }
-        
-        #outputAmount {
-            direction: ltr; 
-            text-align: right;
-            /* تغییر رنگ متن خروجی در صورت نامعتبر بودن ورودی */
-            color: #10B981; 
+        .submit-btn {
+            background-color: #F97316;
+            transition: background-color 0.2s;
         }
-        
-        .notification-box {
-            border-color: #00BCD4; 
-            background-color: #e0f7fa; 
-            color: #00BCD4; 
+        .submit-btn:hover {
+            background-color: #EA580C;
         }
-        .notification-box .fa-bell, .notification-box .font-bold, .notification-box #baseRateDisplay {
-            color: #00BCD4; 
+        .text-orange-600 {
+            color: #F97316;
         }
-        .notification-box p {
-            color: #4b5563; 
+        /* انیمیشن برای ورود پیام‌های جدید */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        .switch-button, .card header i {
-            background-color: #00BCD4; 
-            color: white;
-        }
-        .switch-button:hover {
-            background-color: #00838F;
-        }
-        .card button.mt-3 {
-             color: #00BCD4 !important;
-        }
-        .border-gray-300 {
-            border-color: #e5e7eb !important; 
-        }
-
-        /* --- استایل‌های اختصاصی فوتر (تم تیره) --- */
-        .custom-footer {
-            background-color: #1f2937; 
-            color: #f3f4f6; 
-            border-top: 1px solid #4a5568; 
-        }
-        .custom-footer .border-gray-800 {
-             border-color: #4a5568 !important; 
-        }
-        .custom-footer .text-slate-400 {
-            color: #94a3b8; 
-        }
-        .custom-footer .text-sky-400 {
-            color: #38bdf8; 
-        }
-        .custom-footer .text-green-400 {
-            color: #4ade80; 
-        }
-        
-        /* استایل برای پیام خطای ورودی */
-        .error-text {
-            color: #EF4444 !important; /* رنگ قرمز برای خطا */
-            direction: rtl !important;
-            text-align: right !important;
-        }
-
-        /* استایل‌های انیمیشن */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-            opacity: 0;
+        .fade-in-down {
+            animation: fadeInDown 0.4s ease-out;
         }
     </style>
 </head>
-<body class="p-0">
+<body class="p-4 md:p-8">
 
-    <div class="main-content">
-        <div class="w-full max-w-lg mt-10 card p-6 md:p-10 rounded-2xl">
-            <header class="text-center mb-8">
-                <i class="fa-solid fa-arrow-right-arrow-left text-4xl mb-3"></i>
-                <h1 class="text-3xl font-extrabold">مبدل تبدیل ارز</h1>
-                <p class="text-gray-500 mt-2">تبدیل دوطرفه ارزهای اصلی بر اساس نرخ روز بازار</p>
-            </header>
+    <div class="max-w-4xl mx-auto">
+        
+        <header class="text-center mb-10">
+            <i class="fa-solid fa-note-sticky text-4xl text-orange-600 mb-3"></i>
+            <h1 class="text-4xl font-extrabold text-gray-800">تابلوی اعلانات عمومی</h1>
+            <p class="text-gray-500 mt-2">پیام خود را ثبت کنید تا همه ببینند! (ذخیره در مرورگر شما)</p>
+        </header>
 
-            <div class="notification-box border-r-4 p-4 mb-8 rounded-lg">
-                <div class="flex items-center">
-                    <i class="fa-solid fa-bell ml-2"></i>
-                    <span class="font-bold" id="baseCurrencyName"></span> 
+        <section id="add-message-section" class="card p-6 rounded-xl mb-10">
+            <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-gray-700">ثبت پیام جدید</h2>
+            <form id="message-form" class="space-y-4">
+                
+                <div>
+                    <label for="message-content" class="block text-sm font-medium text-gray-700">پیام شما</label>
+                    <textarea id="message-content" rows="3" required
+                        class="mt-1 block w-full p-3 border rounded-md shadow-sm resize-y"
+                        placeholder="حداکثر ۲۰۰ کاراکتر"></textarea>
                 </div>
-                <span id="baseRateDisplay" class="font-extrabold text-2xl block mt-2"></span> تومان
-                <p class="text-xs mt-1" id="updateInfo"></p>
-            </div>
-
-            <div class="mb-6">
-                <div class="input-group flex gap-3 mb-3">
-                    <div class="w-3/5">
-                        <label for="inputAmount" class="block text-sm font-medium mb-2" id="inputLabel">مقدار ارز</label>
-                        <input type="number" id="inputAmount" oninput="calculate()" class="w-full p-3 pr-4 border rounded-lg text-lg" placeholder="مبلغ را وارد کنید" value="1">
-                    </div>
-                    <div class="w-2/5 relative">
-                        <label for="inputCurrency" class="block text-sm font-medium mb-2">انتخاب ارز</label>
-                        <select id="inputCurrency" onchange="switchCurrency(false)" class="w-full p-3 border rounded-lg text-lg appearance-none">
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute left-3 top-1/2 mt-3 text-gray-400 pointer-events-none"></i>
+                
+                <div class="flex space-x-4 space-x-reverse">
+                    <div class="flex-1">
+                        <label for="message-author" class="block text-sm font-medium text-gray-700">نام مستعار</label>
+                        <input type="text" id="message-author" value="ناشناس" required
+                            class="mt-1 block w-full p-3 border rounded-md shadow-sm">
                     </div>
                 </div>
 
-                <div class="flex justify-center my-3">
-                    <button onclick="swapCurrencies()" class="switch-button p-2 rounded-full shadow-lg">
-                        <i class="fa-solid fa-arrows-up-down"></i>
-                    </button>
-                </div>
+                <button type="submit" 
+                        class="submit-btn w-full flex justify-center py-3 px-4 border border-transparent 
+                                rounded-md shadow-sm text-lg font-medium text-white hover:bg-orange-700 focus:outline-none">
+                    <i class="fa-solid fa-paper-plane ml-2"></i> ارسال پیام
+                </button>
+            </form>
+        </section>
 
-                <div class="input-group flex gap-3">
-                    <div class="w-3/5">
-                        <label for="outputAmount" class="block text-sm font-medium mb-2" id="outputLabel">معادل تومان</label>
-                        <div class="relative result-box p-4 rounded-lg shadow-inner">
-                            <p id="outputAmount" class="text-4xl font-extrabold inline-block">۰</p>
-                            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold" id="outputUnitDisplay">تومان</span>
-                            <button onclick="copyToClipboard()" 
-                               class="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full text-gray-500 hover:bg-gray-100 transition duration-150"
-                               title="کپی کردن نتیجه">
-                                <i class="fa-solid fa-copy text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="w-2/5 relative">
-                        <label for="outputCurrency" class="block text-sm font-medium mb-2">انتخاب واحد</label>
-                        <select id="outputCurrency" onchange="switchCurrency(true)" class="w-full p-3 border rounded-lg text-lg appearance-none">
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute left-3 top-1/2 mt-3 text-gray-400 pointer-events-none"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="border-t pt-4 border-gray-300">
-                <label for="customRateInput" class="block text-sm font-medium mb-2">نرخ سفارشی (برای محاسبات دلخواه)</label>
-                <div class="relative">
-                    <input type="number" id="customRateInput" oninput="calculate()" class="w-full p-3 pr-10 border rounded-lg text-lg" placeholder="نرخ دلخواه را وارد کنید">
-                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">تومان</span>
-                </div>
-                <button onclick="resetRate()" class="mt-3 text-sm font-medium transition">بازنشانی به نرخ پایه بازار</button>
-            </div>
-        </div>
-    </div> <footer class="text-center py-8 mt-12 border-t border-gray-800 text-slate-400 fade-in-up custom-footer" style="animation-delay: 0.4s;">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-
-                <div class="flex flex-col items-center md:items-start gap-3">
-                    <div class="flex items-center gap-3">
-                        <i class="fab fa-telegram text-2xl text-sky-400"></i>
-                        <h4 class="font-bold text-lg">به کانال تلگرام ما بپیوندید</h4>
-                    </div>
-                    <p>برای دریافت آخرین پروکسی‌ها و اطلاع از بروزرسانی‌ها، ما را دنبال کنید.</p>
-                    <a href="https://t.me/VPN_MAR_KET" target="_blank" rel="noopener noreferrer"
-                       class="group inline-block mt-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 font-semibold py-2 px-5 border border-sky-500/20 rounded-lg transition-all duration-300">
-                         @VPN_MAR_KET <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                    </a>
-                </div>
-
-                <div class="flex flex-col items-center md:items-end gap-3">
-                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-code text-xl text-green-400"></i>
-                        <h4 class="font-bold text-lg">طراح و توسعه دهنده</h4>
-                    </div>
-                    <p>ساخته شده با <i class="fa-solid fa-heart text-red-500"></i> برای دسترسی آزاد</p>
-                     <a href="https://t.me/reza_gh_ni" target="_blank" rel="noopener noreferrer"
-                       class="group inline-block mt-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-semibold py-2 px-5 border border-green-500/20 rounded-lg transition-all duration-300">
-                        @reza_gh_ni
-                        <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                    </a>
-                </div>
-
-            </div>
-            
-            <div class="mt-8 pt-6 border-t border-gray-800/50 text-sm">
-                <p class="flex items-center justify-center gap-x-2 flex-wrap">
-                    <span>&copy; 1404 VPN MARKET. تمامی حقوق محفوظ است.</span>
-                    <span class="text-xs font-medium text-gray-400">بروزرسانی: <span id="footerUpdateDate"></span></span>
-                    <span class="bg-sky-500/10 text-sky-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-sky-500/20">نسخه 0.1</span>
+        <section>
+            <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-gray-700">پیام‌های ثبت شده</h2>
+            <div id="messages-container" class="space-y-4">
+                <p id="no-message-placeholder" class="text-center text-gray-500 mt-8 hidden">
+                    <i class="fa-solid fa-inbox text-5xl mb-3"></i><br>
+                    هنوز پیامی ثبت نشده است. اولین نفر باشید!
                 </p>
             </div>
-        </div>
-    </footer>
+            
+             <button onclick="clearAllMessages()" id="clear-messages-btn"
+                    class="mt-6 text-sm font-medium text-red-600 hover:text-red-800 hidden">
+                <i class="fa-solid fa-trash-can ml-1"></i> پاک کردن تمام پیام‌ها
+            </button>
+        </section>
+
+    </div>
 
     <script>
-        // **********************************************
-        // ۱. داده‌های اصلی نرخ ارز (بروزرسانی شده در ۱۱ مهر ۱۴۰۴ با نرخ بازار آزاد)
-        // **********************************************
-        const exchangeData = {
-            updateDate: "۱۱ مهر ۱۴۰۴ (بر اساس نرخ بازار آزاد)",
-            rates: {
-                // نرخ دلار بر اساس قیمت‌های لحظه‌ای بازار آزاد
-                "USD": { rate: 117100, name: "دلار آمریکا", unit: "$" }, 
-                // سایر نرخ‌ها بر اساس قیمت‌های روز ۱۱ مهر ۱۴۰۴ به‌روزرسانی شدند:
-                "EUR": { rate: 137300, name: "یورو", unit: "€" }, 
-                "GBP": { rate: 157400, name: "پوند بریتانیا", unit: "£" },
-                "AED": { rate: 31860, name: "درهم امارات", unit: "د.ا." }, 
-                "AZN": { rate: 68900, name: "منات آذربایجان", unit: "₼" }, 
-                "CHF": { rate: 146900, name: "فرانک سوئیس", unit: "Fr" }, 
-                "CAD": { rate: 83900, name: "دلار کانادا", unit: "C$" },
-                "AUD": { rate: 77300, name: "دلار استرالیا", unit: "A$" },
-                "SEK": { rate: 12460, name: "کرون سوئد", unit: "kr" }, 
-                "NOK": { rate: 11740, name: "کرون نروژ", unit: "kr" }, 
-                "RUB": { rate: 1435, name: "روبل روسیه", unit: "₽" },
-                "THB": { rate: 3610, name: "بات تایلند", unit: "฿" },
-                "SGD": { rate: 90820, name: "دلار سنگاپور", unit: "S$" }, 
-                "HKD": { rate: 15040, name: "دلار هنگ کنگ", unit: "HK$" }, 
-                "AMD": { rate: 306, name: "درام ارمنستان", unit: "֏" }, 
-                "DKK": { rate: 18400, name: "کرون دانمارک", unit: "kr" }, 
-                "JPY": { rate: 795, name: "ین ژاپن", unit: "¥" }, 
-                "TRY": { rate: 2870, name: "لیره ترکیه", unit: "₺" },
-                "CNY": { rate: 16420, name: "یوان چین", unit: "¥" },
-                "SAR": { rate: 31220, name: "ریال عربستان سعودی", unit: "ر.س" }, 
-                "INR": { rate: 1320, name: "روپیه هند", unit: "₹" },
-                "MYR": { rate: 27820, name: "رینگیت مالزی", unit: "RM" },
-                "AFN": { rate: 1730, name: "افغانی", unit: "؋" },
-                "KWD": { rate: 382980, name: "دینار کویت", unit: "د.ک" }, 
-                "IQD": { rate: 83, name: "دینار عراق", unit: "ع.د" }, 
-                "BHD": { rate: 311440, name: "دینار بحرین", unit: "د.ب" }, 
-                "OMR": { rate: 304600, name: "ریال عمان", unit: "ر.ع" },
-                "QAR": { rate: 32180, name: "ریال قطر", unit: "ر.ق" }, 
-                "IRR": { rate: 1, name: "تومان", unit: "تومان" } 
-            }
-        };
+        const MESSAGE_KEY = 'simpleMessageBoardMessages';
+        const container = document.getElementById('messages-container');
+        const form = document.getElementById('message-form');
+        const contentInput = document.getElementById('message-content');
+        const authorInput = document.getElementById('message-author');
+        const placeholder = document.getElementById('no-message-placeholder');
+        const clearBtn = document.getElementById('clear-messages-btn');
 
-        const elements = {
-            inputAmount: document.getElementById('inputAmount'),
-            inputCurrency: document.getElementById('inputCurrency'),
-            outputAmount: document.getElementById('outputAmount'),
-            outputCurrency: document.getElementById('outputCurrency'),
-            inputLabel: document.getElementById('inputLabel'),
-            outputLabel: document.getElementById('outputLabel'),
-            outputUnitDisplay: document.getElementById('outputUnitDisplay'),
-            baseRateDisplay: document.getElementById('baseRateDisplay'),
-            baseCurrencyName: document.getElementById('baseCurrencyName'),
-            customRateInput: document.getElementById('customRateInput'),
-            updateInfo: document.getElementById('updateInfo'),
-            footerUpdateDate: document.getElementById('footerUpdateDate') 
-        };
-        
-        // **********************************************
-        // ۲. توابع اصلی و کمکی
-        // **********************************************
+        // تابع کمکی برای فرمت تاریخ
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return date.toLocaleDateString('fa-IR', options);
+        }
 
-        // تابع کمکی برای ساخت المان option
-        function createOptionElement(code, name) {
-            const option = document.createElement('option');
-            option.value = code;
+        // ۱. نمایش پیام‌ها از LocalStorage
+        function loadMessages() {
+            // بازیابی پیام‌ها یا آرایه خالی اگر چیزی وجود ندارد
+            const messages = JSON.parse(localStorage.getItem(MESSAGE_KEY)) || [];
             
-            const flags = {
-                "USD": "🇺🇸", "EUR": "🇪🇺", "GBP": "🇬🇧", "CHF": "🇨🇭", "CAD": "🇨🇦", "AUD": "🇦🇺",
-                "SEK": "🇸🇪", "NOK": "🇳🇴", "RUB": "🇷🇺", "THB": "🇹🇭", "SGD": "🇸🇬", "HKD": "🇭🇰",
-                "AZN": "🇦🇿", "AMD": "🇦🇲", "DKK": "🇩🇰", "AED": "🇦🇪", "JPY": "🇯🇵", "TRY": "🇹🇷",
-                "CNY": "🇨🇳", "SAR": "🇸🇦", "INR": "🇮🇳", "MYR": "🇲🇾", "AFN": "🇦🇫", "KWD": "🇰🇼",
-                "IQD": "🇮🇶", "BHD": "🇧🇭", "OMR": "🇴🇲", "QAR": "🇶🇦", "IRR": "🇮🇷"
+            // مرتب سازی جدیدترین پیام در بالا
+            messages.sort((a, b) => b.timestamp - a.timestamp); 
+
+            container.innerHTML = ''; // پاک کردن محتوای قبلی
+            
+            if (messages.length === 0) {
+                placeholder.classList.remove('hidden');
+                clearBtn.classList.add('hidden');
+            } else {
+                placeholder.classList.add('hidden');
+                clearBtn.classList.remove('hidden');
+            }
+
+            messages.forEach(msg => {
+                const messageElement = createMessageElement(msg);
+                container.appendChild(messageElement);
+            });
+        }
+        
+        // ۲. ایجاد المان HTML برای یک پیام
+        function createMessageElement(msg) {
+            const card = document.createElement('div');
+            card.className = 'message-card p-4 rounded-lg card fade-in-down';
+            card.innerHTML = `
+                <p class="text-lg text-gray-800 mb-2 whitespace-pre-wrap">${msg.content}</p>
+                <div class="flex justify-between items-center text-sm text-gray-500 mt-3 border-t pt-2">
+                    <span class="font-medium text-orange-600">
+                        <i class="fa-solid fa-user-edit ml-1"></i> ${msg.author}
+                    </span>
+                    <span class="text-xs">
+                        <i class="fa-solid fa-clock ml-1"></i> ${formatDate(msg.timestamp)}
+                    </span>
+                </div>
+            `;
+            return card;
+        }
+
+        // ۳. ذخیره پیام جدید
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const content = contentInput.value.trim();
+            const author = authorInput.value.trim() || 'ناشناس';
+            
+            if (content.length > 200) {
+                alert('پیام نباید بیشتر از ۲۰۰ کاراکتر باشد.');
+                return;
+            }
+            if (!content) return; 
+
+            const newMessage = {
+                content: content,
+                author: author,
+                timestamp: Date.now() 
             };
-            
-            option.textContent = (flags[code] || '') + ' ' + name + (code === 'IRR' ? '/ریال' : '');
-            return option;
-        }
 
-        // تابع جدید: پر کردن لیست‌های انتخابی ارز (بهبود ساختار)
-        function populateCurrencies() {
-            const inputSelect = elements.inputCurrency;
-            const outputSelect = elements.outputCurrency;
-            
-            inputSelect.innerHTML = '';
-            outputSelect.innerHTML = '';
+            const messages = JSON.parse(localStorage.getItem(MESSAGE_KEY)) || [];
+            messages.push(newMessage);
+            localStorage.setItem(MESSAGE_KEY, JSON.stringify(messages));
 
-            const currencyCodes = Object.keys(exchangeData.rates);
-            
-            currencyCodes.forEach(code => {
-                const currency = exchangeData.rates[code];
-                
-                // ایجاد و اضافه کردن option به هر دو لیست
-                inputSelect.appendChild(createOptionElement(code, currency.name).cloneNode(true));
-                outputSelect.appendChild(createOptionElement(code, currency.name).cloneNode(true));
-            });
-            
-            // تنظیم مقادیر پیش‌فرض
-            inputSelect.value = 'USD';
-            outputSelect.value = 'IRR'; 
-        }
-
-
-        function switchCurrency(isOutputChange) {
-            calculate();
-        }
-
-        function swapCurrencies() {
-            const inputVal = elements.inputCurrency.value;
-            const outputVal = elements.outputCurrency.value;
-            
-            elements.inputCurrency.value = outputVal;
-            elements.outputCurrency.value = inputVal;
-            
-            calculate();
-        }
-
-        // تابع کپی کردن نتیجه
-        function copyToClipboard() {
-            const textToCopy = elements.outputAmount.textContent.replace(/,/g, '').replace(/،/g, ''); 
-            
-            if (textToCopy === 'ورودی نامعتبر' || isNaN(parseFloat(textToCopy))) {
-                 alert("خطا: نتیجه‌ای برای کپی کردن وجود ندارد.");
-                 return;
-            }
-
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                alert("مبلغ کپی شد: " + textToCopy);
-            }).catch(err => {
-                console.error('Could not copy text: ', err);
-            });
-        }
-        
-        function calculate() {
-            const inputValue = elements.inputAmount.value;
-            const amount = parseFloat(inputValue);
-            const inputCode = elements.inputCurrency.value;
-            const outputCode = elements.outputCurrency.value;
-
-            // --- اعتبارسنجی ورودی و اعلان‌های کاربردی ---
-            if (isNaN(amount) || amount <= 0 || inputValue.trim() === '') {
-                // اگر ورودی نامعتبر است یا صفر و منفی، پیام خطا نمایش داده شود
-                elements.outputAmount.textContent = 'ورودی نامعتبر';
-                elements.outputAmount.classList.add('error-text'); // اضافه کردن استایل خطا
-                
-                // همچنین برای نرخ پایه هم مقادیر را خالی کنید
-                elements.baseRateDisplay.textContent = '---';
-                elements.baseCurrencyName.textContent = 'نرخ';
-                
-                // اطلاعات به‌روزرسانی در فوتر همچنان نمایش داده شود
-                elements.footerUpdateDate.textContent = exchangeData.updateDate.split('(')[0].trim();
-                elements.updateInfo.textContent = `آخرین بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
-                
-                return; // از ادامه محاسبات صرف نظر کنید
-            }
-            // حذف استایل خطا در صورت معتبر بودن ورودی
-            elements.outputAmount.classList.remove('error-text'); 
-            // --- پایان اعتبارسنجی ---
-            
-            let rateInputToBase = exchangeData.rates[inputCode].rate;
-            let rateOutputToBase = exchangeData.rates[outputCode].rate;
-            
-            let currentRate = rateInputToBase; 
-            
-            if (elements.customRateInput.value && !isNaN(parseFloat(elements.customRateInput.value))) {
-                currentRate = parseFloat(elements.customRateInput.value);
-            }
-            
-            // نمایش نرخ پایه در اعلان بالا
-            if (inputCode === 'IRR' && outputCode !== 'IRR') { 
-                 elements.baseRateDisplay.textContent = formatNumber(rateOutputToBase);
-                 elements.baseCurrencyName.textContent = `نرخ ${exchangeData.rates[outputCode].name} آزاد:`;
-            } else if (inputCode !== 'IRR') { 
-                 elements.baseRateDisplay.textContent = formatNumber(currentRate);
-                 elements.baseCurrencyName.textContent = `نرخ ${exchangeData.rates[inputCode].name} آزاد:`;
-            } else { 
-                 elements.baseRateDisplay.textContent = '---';
-                 elements.baseCurrencyName.textContent = 'نرخ';
-            }
-            
-            // نمایش تاریخ به‌روزرسانی در اعلان و فوتر
-            elements.updateInfo.textContent = `آخرین بروزرسانی در تاریخ: ${exchangeData.updateDate}`;
-            elements.footerUpdateDate.textContent = exchangeData.updateDate.split('(')[0].trim(); 
-            
-            // تنظیم برچسب‌ها
-            elements.inputLabel.textContent = `مقدار ${exchangeData.rates[inputCode].name}`;
-            elements.outputLabel.textContent = `معادل ${exchangeData.rates[outputCode].name}`;
-            elements.outputUnitDisplay.textContent = exchangeData.rates[outputCode].unit;
-
-            // انجام محاسبات
-            let resultAmount;
-            
-            if (inputCode === 'IRR') { 
-                resultAmount = amount / rateOutputToBase; 
-            } else if (outputCode === 'IRR') { 
-                resultAmount = amount * currentRate;
-            } else { 
-                const amountInToman = amount * currentRate;
-                resultAmount = amountInToman / rateOutputToBase;
-            }
-
-            elements.outputAmount.textContent = formatNumber(resultAmount, outputCode === 'IRR' ? 0 : 4);
-        }
-        
-        function resetRate() {
-            elements.customRateInput.value = '';
-            calculate();
-        }
-
-        function formatNumber(num, decimalPlaces = 0) {
-            if (isNaN(num)) return '۰';
-            
-            let formatted = num.toFixed(decimalPlaces);
-            const parts = formatted.split('.');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            formatted = parts.join('.'); 
-            return formatted.replace(/(\d)/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            populateCurrencies(); 
-            calculate(); 
+            // پاک کردن فرم
+            contentInput.value = '';
+            // نمایش مجدد پیام‌ها
+            loadMessages();
         });
+        
+        // ۴. پاک کردن همه پیام ها
+        function clearAllMessages() {
+            if (confirm('آیا مطمئن هستید که می‌خواهید تمام پیام‌ها را پاک کنید؟')) {
+                localStorage.removeItem(MESSAGE_KEY);
+                loadMessages(); // بارگذاری مجدد و نمایش صفحه خالی
+            }
+        }
+        // اضافه کردن تابع به پنجره سراسری برای فراخوانی از دکمه HTML
+        window.clearAllMessages = clearAllMessages;
 
+
+        // اجرای اولیه برای نمایش پیام‌های موجود هنگام بارگذاری صفحه
+        document.addEventListener('DOMContentLoaded', loadMessages);
     </script>
 </body>
 </html>
