@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تابلوی اعلانات پیشرفته</title>
+    <title>تابلوی اعلانات عمومی (Firestore)</title>
+    <!-- استفاده از CDN برای Tailwind CSS و فونت -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
     
     <style>
+        /* تنظیم فونت و جهت‌دهی کلی */
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: #f3f4f6;
@@ -27,10 +29,10 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"], textarea, #search-input {
+        input, textarea, select {
             border-color: #d1d5db;
         }
-        input[type="text"]:focus, textarea:focus, #search-input:focus {
+        input:focus, textarea:focus, select:focus {
             border-color: #F97316;
             box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
             outline: none;
@@ -45,6 +47,7 @@
         .text-orange-600 {
             color: #F97316;
         }
+
         /* کلاس‌های رنگی برای کارت‌ها */
         .color-blue { --card-bg-color: #e0f2fe; --card-border-color: #38bdf8; }
         .color-green { --card-bg-color: #dcfce7; --card-border-color: #22c55e; }
@@ -64,18 +67,38 @@
         .fade-in-down {
             animation: fadeInDown 0.4s ease-out;
         }
+
+        /* استایل برای پیغام خطا/موفقیت */
+        #message-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            transform: translateY(100%);
+            z-index: 1000;
+        }
+        .toast-show {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-4xl mx-auto">
         
+        <!-- عنوان اصلی -->
         <header class="text-center mb-10">
-            <i class="fa-solid fa-clipboard-list text-4xl text-orange-600 mb-3"></i>
-            <h1 class="text-4xl font-extrabold text-gray-800">تابلوی اعلانات عمومی</h1>
-            <p class="text-gray-500 mt-2">پیام خود را ثبت کنید تا همه ببینند! (ذخیره در مرورگر شما)</p>
+            <i class="fa-solid fa-cloud text-4xl text-orange-600 mb-3"></i>
+            <h1 class="text-4xl font-extrabold text-gray-800">تابلوی اعلانات عمومی (آنلاین)</h1>
+            <p class="text-gray-500 mt-2">پیام‌ها در دیتابیس ابری ذخیره می‌شوند و برای همه قابل مشاهده‌اند.</p>
         </header>
 
+        <!-- بخش ارسال پیام جدید -->
         <section id="add-message-section" class="card p-6 rounded-xl mb-10">
             <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-gray-700">ثبت پیام جدید</h2>
             <form id="message-form" class="space-y-4">
@@ -105,7 +128,7 @@
                     </div>
                 </div>
 
-                <button type="submit" 
+                <button type="submit" id="submit-btn"
                         class="submit-btn w-full flex justify-center py-3 px-4 border border-transparent 
                                 rounded-md shadow-sm text-lg font-medium text-white hover:bg-orange-700 focus:outline-none">
                     <i class="fa-solid fa-paper-plane ml-2"></i> ارسال پیام
@@ -113,15 +136,15 @@
             </form>
         </section>
 
+        <!-- بخش نمایش پیام‌ها و جستجو -->
         <section>
             <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h2 class="text-2xl font-bold text-gray-700">پیام‌های ثبت شده</h2>
-                <button onclick="clearAllMessages()" id="clear-messages-btn"
-                        class="text-sm font-medium text-red-600 hover:text-red-800 hidden">
-                    <i class="fa-solid fa-trash-can ml-1"></i> پاک کردن همه
-                </button>
+                <!-- نمایش تعداد پیام‌های فعال -->
+                <h2 class="text-2xl font-bold text-gray-700">پیام‌های عمومی (<span id="message-count">0</span>)</h2>
+                <span id="user-info" class="text-sm text-gray-500">در حال اتصال...</span>
             </div>
             
+            <!-- نوار جستجو -->
             <div class="mb-6 relative">
                  <input type="text" id="search-input" oninput="filterMessages()" 
                         class="w-full p-3 pr-10 border rounded-lg text-lg" 
@@ -130,6 +153,11 @@
             </div>
             
             <div id="messages-container" class="space-y-4">
+                <div id="loading-spinner" class="text-center text-gray-500 mt-8">
+                    <i class="fa-solid fa-spinner fa-spin text-4xl mb-3"></i><br>
+                    در حال بارگذاری پیام‌ها از دیتابیس...
+                </div>
+                <!-- پیام ها اینجا نمایش داده می شوند -->
                 <p id="no-message-placeholder" class="text-center text-gray-500 mt-8 hidden">
                     <i class="fa-solid fa-inbox text-5xl mb-3"></i><br>
                     هنوز پیامی ثبت نشده است. اولین نفر باشید!
@@ -139,13 +167,37 @@
                     نتیجه‌ای برای جستجوی شما پیدا نشد.
                 </p>
             </div>
-            
         </section>
+        
+        <!-- پیغام سفارشی (Toast Notification) -->
+        <div id="message-toast" class="opacity-0"></div>
 
     </div>
 
-    <script>
-        const MESSAGE_KEY = 'advancedMessageBoardMessages';
+    <!-- Firebase Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // تنظیم لاگ برای دیباگ (اختیاری)
+        setLogLevel('Debug');
+
+        // متغیرهای سراسری که توسط Canvas فراهم می‌شوند
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // متغیرهای دیتابیس
+        let db;
+        let auth;
+        let currentUserId;
+
+        // مسیر کالکشن عمومی برای همه کاربران
+        const collectionPath = `artifacts/${appId}/public/data/messages`;
+
+        // المان‌های DOM
         const container = document.getElementById('messages-container');
         const form = document.getElementById('message-form');
         const contentInput = document.getElementById('message-content');
@@ -153,81 +205,147 @@
         const colorSelect = document.getElementById('message-color');
         const placeholder = document.getElementById('no-message-placeholder');
         const noResultPlaceholder = document.getElementById('no-result-placeholder');
-        const clearBtn = document.getElementById('clear-messages-btn');
         const charCountSpan = document.getElementById('char-count');
         const searchInput = document.getElementById('search-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const userInfoSpan = document.getElementById('user-info');
+        const messageCountSpan = document.getElementById('message-count'); // NEW
         
-        // به‌روزرسانی شمارنده کاراکتر
-        contentInput.addEventListener('input', () => {
-            charCountSpan.textContent = contentInput.value.length;
-        });
+        // متغیر برای ذخیره لیست پیام‌ها پس از بارگذاری اولیه
+        let allMessages = []; 
 
+        /**
+         * نمایش پیغام Toast سفارشی
+         * @param {string} message - متن پیغام
+         * @param {string} type - نوع پیغام (success, error, info)
+         */
+        function showToast(message, type) {
+            const toast = document.getElementById('message-toast');
+            toast.textContent = message;
+            toast.className = 'toast-show'; 
+            
+            if (type === 'success') {
+                toast.style.backgroundColor = '#10B981'; // Green-500
+            } else if (type === 'error') {
+                toast.style.backgroundColor = '#EF4444'; // Red-500
+            } else {
+                toast.style.backgroundColor = '#3B82F6'; // Blue-500 (info)
+            }
+
+            // پنهان کردن بعد از ۳ ثانیه
+            setTimeout(() => {
+                toast.classList.remove('toast-show');
+            }, 3000);
+        }
 
         // تابع کمکی برای فرمت تاریخ
         function formatDate(timestamp) {
-            const date = new Date(timestamp);
+            if (!timestamp) return 'تاریخ نامشخص';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             return date.toLocaleDateString('fa-IR', options);
         }
 
-        // ۱. نمایش پیام‌ها (بر اساس فیلتر جستجو)
-        function loadMessages(filterText = '') {
-            const messages = JSON.parse(localStorage.getItem(MESSAGE_KEY)) || [];
-            
-            // مرتب سازی: جدیدترین پیام در بالا
-            messages.sort((a, b) => b.timestamp - a.timestamp); 
+        /**
+         * اتصال به فایربیس و احراز هویت
+         */
+        async function initializeFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
 
-            container.innerHTML = ''; // پاک کردن محتوای قبلی
-            
-            let filteredMessages = messages;
-            
-            // اعمال فیلتر جستجو (بدون حساسیت به بزرگی و کوچکی حروف)
-            if (filterText) {
-                const lowerCaseFilter = filterText.toLowerCase();
-                filteredMessages = messages.filter(msg => 
-                    msg.content.toLowerCase().includes(lowerCaseFilter) ||
-                    msg.author.toLowerCase().includes(lowerCaseFilter)
-                );
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                currentUserId = auth.currentUser?.uid || 'anonymous-user';
+                userInfoSpan.textContent = `شناسه شما: ${currentUserId.substring(0, 8)}...`;
+                
+                showToast("اتصال به دیتابیس موفقیت‌آمیز بود.", 'success');
+                
+                // شروع گوش دادن به پیام‌ها پس از احراز هویت
+                startMessageListener();
+
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                userInfoSpan.textContent = "خطا در اتصال";
+                showToast("خطا در اتصال به دیتابیس. لطفاً صفحه را رفرش کنید.", 'error');
             }
+        }
+        
+        /**
+         * شروع گوش دادن به تغییرات در دیتابیس (Real-Time)
+         */
+        function startMessageListener() {
+            loadingSpinner.classList.remove('hidden');
             
-            // مدیریت نمایش متن‌های جایگزین
-            placeholder.classList.add('hidden');
-            noResultPlaceholder.classList.add('hidden');
-            clearBtn.classList.remove('hidden');
-
-            if (messages.length === 0) {
-                placeholder.classList.remove('hidden');
-                clearBtn.classList.add('hidden');
-            } else if (filteredMessages.length === 0 && filterText) {
-                 noResultPlaceholder.classList.remove('hidden');
-            }
-
-
-            filteredMessages.forEach(msg => {
-                const messageElement = createMessageElement(msg);
-                container.appendChild(messageElement);
+            // onSnapshot به طور مداوم داده‌ها را به‌روزرسانی می‌کند
+            onSnapshot(collection(db, collectionPath), (snapshot) => {
+                const messages = [];
+                snapshot.forEach(doc => {
+                    // اضافه کردن ID داک به داده‌های پیام
+                    messages.push({ id: doc.id, ...doc.data() }); 
+                });
+                
+                // ذخیره تمام پیام‌ها و فراخوانی تابع فیلتر/نمایش
+                allMessages = messages;
+                loadingSpinner.classList.add('hidden');
+                
+                // به‌روزرسانی شمارنده پیام‌ها
+                messageCountSpan.textContent = allMessages.length; 
+                
+                filterMessages(); 
+            }, (error) => {
+                console.error("Error listening to messages:", error);
+                showToast("خطا در دریافت پیام‌ها: " + error.message, 'error');
             });
         }
         
-        // ۲. ایجاد المان HTML برای یک پیام
+        /**
+         * ایجاد المان HTML برای یک پیام
+         * @param {Object} msg - شی پیام
+         */
         function createMessageElement(msg) {
             const card = document.createElement('div');
+            const isOwner = msg.userId === currentUserId; 
+            const authorText = isOwner ? `${msg.author} (شما)` : msg.author;
+            
+            // اطلاعات لایک‌ها
+            const likesCount = msg.likes?.count || 0; 
+            // چک کردن اینکه آیا کاربر فعلی این پیام را لایک کرده است یا خیر
+            const isLiked = msg.likes?.likers && msg.likes.likers[currentUserId]; 
+
             card.className = `message-card p-4 rounded-lg card fade-in-down color-${msg.color || 'default'}`;
             card.setAttribute('data-id', msg.id); 
             card.innerHTML = `
-                <div class="relative">
+                <div class="relative min-h-[30px]">
                     <p class="text-lg text-gray-800 mb-2 whitespace-pre-wrap">${msg.content}</p>
                     
-                    <button onclick="deleteMessage('${msg.id}')" 
-                            class="absolute top-0 left-0 text-gray-400 hover:text-red-500 transition duration-150"
-                            title="حذف پیام">
-                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    <!-- دکمه حذف (راست بالا) -->
+                    ${isOwner ? `
+                        <button onclick="deleteMessage('${msg.id}')" 
+                                class="absolute top-0 right-0 text-gray-400 hover:text-red-500 transition duration-150 p-1"
+                                title="حذف پیام شما">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    ` : ''}
+                    
+                    <!-- دکمه لایک (چپ بالا) -->
+                    <button onclick="toggleLike('${msg.id}')" 
+                            class="absolute top-0 left-0 flex items-center p-1 rounded-full ${isLiked ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-400'} transition duration-200"
+                            title="${isLiked ? 'لغو لایک' : 'لایک کردن'}">
+                        <i class="fa-${isLiked ? 'solid' : 'regular'} fa-heart text-lg"></i>
+                        <span class="mr-1 text-sm font-bold">${likesCount}</span>
                     </button>
                 </div>
                 
                 <div class="flex justify-between items-center text-sm text-gray-500 mt-3 border-t pt-2">
                     <span class="font-medium">
-                        <i class="fa-solid fa-user-edit ml-1"></i> ${msg.author}
+                        <i class="fa-solid fa-user-edit ml-1"></i> ${authorText}
                     </span>
                     <span class="text-xs">
                         <i class="fa-solid fa-clock ml-1"></i> ${formatDate(msg.timestamp)}
@@ -237,9 +355,15 @@
             return card;
         }
 
-        // ۳. ذخیره پیام جدید
-        form.addEventListener('submit', function(e) {
+        /**
+         * ذخیره پیام جدید در دیتابیس
+         */
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
+            if (!db || !currentUserId) {
+                showToast("لطفاً منتظر بمانید تا اتصال برقرار شود.", 'error');
+                return;
+            }
 
             const content = contentInput.value.trim();
             const author = authorInput.value.trim() || 'ناشناس';
@@ -247,66 +371,181 @@
             
             if (!content) return; 
             
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin ml-2"></i> در حال ارسال...';
+
             const newMessage = {
-                // استفاده از زمان به عنوان یک ID منحصر به فرد
-                id: Date.now().toString(), 
                 content: content,
                 author: author,
                 color: color,
-                timestamp: Date.now() 
+                userId: currentUserId, 
+                timestamp: new Date(),
+                likes: { // مقداردهی اولیه برای لایک‌ها
+                    count: 0,
+                    likers: {}
+                }
             };
 
-            const messages = JSON.parse(localStorage.getItem(MESSAGE_KEY)) || [];
-            messages.push(newMessage);
-            localStorage.setItem(MESSAGE_KEY, JSON.stringify(messages));
+            try {
+                await addDoc(collection(db, collectionPath), newMessage);
 
-            // پاک کردن فرم و رفرش
-            contentInput.value = '';
-            authorInput.value = 'ناشناس';
-            colorSelect.value = 'default';
-            charCountSpan.textContent = '0';
-            
-            loadMessages(); // نمایش مجدد پیام‌ها
+                // پاک کردن فرم پس از موفقیت
+                contentInput.value = '';
+                charCountSpan.textContent = '0';
+                authorInput.value = 'ناشناس';
+                colorSelect.value = 'default';
+                
+                showToast("پیام شما با موفقیت ثبت شد.", 'success');
+
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                showToast("خطا در ثبت پیام: " + e.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane ml-2"></i> ارسال پیام';
+            }
         });
         
-        // ۴. حذف یک پیام خاص
-        function deleteMessage(id) {
-            if (!confirm('آیا مطمئن هستید که می‌خواهید این پیام را حذف کنید؟')) {
+        /**
+         * مدیریت لایک/لغو لایک برای یک پیام
+         * @param {string} messageId - شناسه داک فایراستور
+         */
+        async function toggleLike(messageId) {
+            if (!db || !currentUserId) {
+                showToast("لطفاً منتظر بمانید تا اتصال برقرار شود.", 'error');
                 return;
             }
-            let messages = JSON.parse(localStorage.getItem(MESSAGE_KEY)) || [];
-            // فیلتر کردن و نگه داشتن پیام‌هایی که IDشان با مورد حذف شده برابر نیست
-            messages = messages.filter(msg => msg.id !== id); 
-            localStorage.setItem(MESSAGE_KEY, JSON.stringify(messages));
-            loadMessages(); // بارگذاری مجدد
-        }
-        // اضافه کردن تابع به پنجره سراسری
-        window.deleteMessage = deleteMessage;
-        
-        // ۵. پاک کردن همه پیام ها
-        function clearAllMessages() {
-            if (confirm('آیا مطمئن هستید که می‌خواهید تمام پیام‌ها را پاک کنید؟ این عملیات قابل بازگشت نیست.')) {
-                localStorage.removeItem(MESSAGE_KEY);
-                searchInput.value = ''; // پاک کردن جستجو
-                loadMessages(); // بارگذاری مجدد و نمایش صفحه خالی
+
+            try {
+                const messageRef = doc(db, collectionPath, messageId);
+                
+                // پیدا کردن داده‌های پیام از آرایه محلی (به‌روزرسانی شده توسط onSnapshot)
+                const messageToUpdate = allMessages.find(msg => msg.id === messageId);
+
+                if (!messageToUpdate) {
+                    showToast("پیام مورد نظر پیدا نشد.", 'error');
+                    return;
+                }
+                
+                let currentLikes = messageToUpdate.likes?.count || 0;
+                // استفاده از کپی برای جلوگیری از تغییر مستقیم داده‌های onSnapshot
+                let likers = {...(messageToUpdate.likes?.likers || {})}; 
+                
+                let newLikesCount = currentLikes;
+                let action = '';
+
+                if (likers[currentUserId]) {
+                    // لغو لایک (Dislike)
+                    delete likers[currentUserId];
+                    newLikesCount = currentLikes - 1;
+                    action = 'لغو لایک';
+                } else {
+                    // لایک (Like)
+                    likers[currentUserId] = true;
+                    newLikesCount = currentLikes + 1;
+                    action = 'لایک';
+                }
+
+                // بروزرسانی دیتابیس با داده‌های جدید
+                await updateDoc(messageRef, {
+                    likes: {
+                        count: newLikesCount,
+                        likers: likers
+                    }
+                });
+
+                showToast(`پیام با موفقیت ${action} شد.`, 'success');
+
+            } catch (e) {
+                console.error("Error toggling like: ", e);
+                showToast("خطا در عملیات لایک: " + e.message, 'error');
             }
         }
         // اضافه کردن تابع به پنجره سراسری
-        window.clearAllMessages = clearAllMessages;
+        window.toggleLike = toggleLike;
         
-        // ۶. فیلتر کردن پیام‌ها بر اساس ورودی جستجو
+        /**
+         * حذف یک پیام خاص از دیتابیس
+         * @param {string} id - شناسه داک فایراستور
+         */
+        async function deleteMessage(id) {
+            // نمایش پیغام سفارشی به جای confirm
+            if (!window.confirm('آیا مطمئن هستید که می‌خواهید این پیام را حذف کنید؟')) {
+                return;
+            }
+            if (!db) return; 
+
+            try {
+                await deleteDoc(doc(db, collectionPath, id));
+                showToast("پیام حذف شد.", 'info');
+            } catch (e) {
+                console.error("Error deleting document: ", e);
+                showToast("خطا در حذف پیام: " + e.message, 'error');
+            }
+        }
+        // اضافه کردن تابع به پنجره سراسری برای فراخوانی از دکمه HTML
+        window.deleteMessage = deleteMessage;
+        
+        /**
+         * فیلتر کردن پیام‌ها بر اساس ورودی جستجو و نمایش آن‌ها
+         */
         function filterMessages() {
             const filterText = searchInput.value.trim();
-            loadMessages(filterText);
-        }
-        
-        // اجرای اولیه برای نمایش پیام‌های موجود هنگام بارگذاری صفحه
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMessages();
-            contentInput.value = ''; // مطمئن شدن از پاک بودن هنگام بارگذاری مجدد
-            charCountSpan.textContent = '0';
-        });
+            container.innerHTML = '';
+            
+            // مرتب سازی: جدیدترین پیام در بالا و لایک‌های بیشتر در بالا
+            const sortedMessages = [...allMessages].sort((a, b) => {
+                // اول بر اساس زمان (جدیدترین در بالا)
+                const timeDiff = b.timestamp.seconds - a.timestamp.seconds;
+                if (timeDiff !== 0) return timeDiff;
+                
+                // دوم بر اساس تعداد لایک (بیشترین در بالا)
+                const likesA = a.likes?.count || 0;
+                const likesB = b.likes?.count || 0;
+                return likesB - likesA;
+            });
+            
+            let filteredMessages = sortedMessages;
+            
+            // اعمال فیلتر جستجو (بدون حساسیت به بزرگی و کوچکی حروف)
+            if (filterText) {
+                const lowerCaseFilter = filterText.toLowerCase();
+                filteredMessages = sortedMessages.filter(msg => 
+                    msg.content.toLowerCase().includes(lowerCaseFilter) ||
+                    msg.author.toLowerCase().includes(lowerCaseFilter)
+                );
+            }
+            
+            // مدیریت نمایش متن‌های جایگزین
+            placeholder.classList.add('hidden');
+            noResultPlaceholder.classList.add('hidden');
+            
+            if (allMessages.length === 0 && !loadingSpinner.classList.contains('hidden')) {
+                // هنوز بارگذاری اولیه کامل نشده
+                return; 
+            } else if (allMessages.length === 0) {
+                placeholder.classList.remove('hidden');
+            } else if (filteredMessages.length === 0 && filterText) {
+                 noResultPlaceholder.classList.remove('hidden');
+            }
 
+            filteredMessages.forEach(msg => {
+                const messageElement = createMessageElement(msg);
+                container.appendChild(messageElement);
+            });
+        }
+        // اضافه کردن تابع به پنجره سراسری
+        window.filterMessages = filterMessages;
+
+
+        // اجرای اولیه: اتصال به فایربیس
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeFirebase();
+            // به‌روزرسانی شمارنده کاراکتر
+            contentInput.addEventListener('input', () => {
+                charCountSpan.textContent = contentInput.value.length;
+            });
+        });
     </script>
 </body>
 </html>
